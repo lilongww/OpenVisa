@@ -1,0 +1,47 @@
+﻿/*!
+    \class      OpenVisa::StandardEventStatusRegister
+    \brief      标准事件状态寄存器.
+    \ingroup    openvisa
+    \inmodule   OpenVisa
+    \inheaderfile StandardEventStatusRegister.h
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::operationComplete
+    \brief      操作完成。显示该操作已完成。当按照*OPC命令完成时设置此位.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::requestControl
+    \brief      请求控制.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::queryError
+    \brief      查询错误。在没有数据存在或挂起的数据时，要么尝试读取输出队列，或者输出队列中的数据丢失.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::deviceError
+    \brief      设备错误。显示发生了设备错误.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::executionError
+    \brief      执行错误。显示在执行命令或查询时发生的错误.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::commandError
+    \brief      命令错误。显示在设备解析命令或查询时发生了错误.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::userRequest
+    \brief      用户请求。表示已发生了一个应用程序事件.
+*/
+
+/*!
+    \variable   OpenVisa::StandardEventStatusRegister::userRequest
+    \brief      已通电。显示示波器已通电。完成后，诊断自检也会设置此位.
+*/
