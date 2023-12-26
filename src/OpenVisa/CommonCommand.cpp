@@ -56,7 +56,10 @@ int Object::CommonCommand::ese() { return OpenVisa::decode<int>(query("*ESE?"));
                 事件寄存器是只读寄存器，从条件寄存器锁存事件。
                 设置事件位时，将忽略与该位相对应的随后发生的事件。(*ESR?).
 */
-int Object::CommonCommand::esr() { return OpenVisa::decode<int>(query("*ESR?")); }
+StandardEventStatusRegister Object::CommonCommand::esr()
+{
+    return std::bit_cast<StandardEventStatusRegister>(OpenVisa::decode<uint8_t>(query("*ESR?")));
+}
 
 /*!
     \brief      标识查询。 返回仪器的标识字符串.

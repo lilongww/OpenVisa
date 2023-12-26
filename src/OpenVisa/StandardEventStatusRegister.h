@@ -18,43 +18,19 @@
 **********************************************************************************/
 #pragma once
 
-#include "Object.h"
-#include "ObjectAdapter.h"
-#include "StandardEventStatusRegister.h"
-#include "StatusByteRegister.h"
+#include <cstdint>
 
-#include <vector>
-
-#if WIN32
-#pragma warning(push)
-#pragma warning(disable : 4275)
-#endif
 namespace OpenVisa
 {
-class OPENVISA_EXPORT Object::CommonCommand : private ObjectAdapter
+struct StandardEventStatusRegister
 {
-public:
-    void cls();
-    void setEse(int status);
-    int ese();
-    StandardEventStatusRegister esr();
-    std::string idn();
-    void setOpc();
-    bool opc();
-    std::vector<std::string> opt();
-    void rst();
-    void setSre(int status);
-    int sre();
-    StatusByteRegisters stb();
-    bool tst();
-    void wai();
-    void rcl(int i);
-
-private:
-    inline CommonCommand(Object& parent) : ObjectAdapter(parent) {};
-    friend Object;
+    uint8_t operationComplete : 1;
+    uint8_t requestControl    : 1;
+    uint8_t queryError        : 1;
+    uint8_t deviceError       : 1;
+    uint8_t executionError    : 1;
+    uint8_t commandError      : 1;
+    uint8_t userRequest       : 1;
+    uint8_t powerOn           : 1;
 };
-#if WIN32
-#pragma warning(pop)
-#endif
 } // namespace OpenVisa
