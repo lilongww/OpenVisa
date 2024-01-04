@@ -17,6 +17,7 @@
 **  along with OpenVisa.  If not, see <https://www.gnu.org/licenses/>.          **
 **********************************************************************************/
 #pragma once
+
 #include "OncRpcProtocol.h"
 
 namespace OpenVisa
@@ -312,6 +313,11 @@ public:
             auto buffer = this->buffer();
             auto offset = buffer.take(m_error);
             offset += buffer.take(reinterpret_cast<long&>(m_reason));
+            if (m_dataSize == 8)
+            {
+                m_buffer = std::string {};
+                return; // 无数据时 size 字节不存在
+            }
             unsigned int size;
             offset += buffer.take(size);
             // 包大小

@@ -34,6 +34,7 @@ struct Object::Attribute::Impl
     std::optional<Parity> parity;
     std::optional<StopBits> stopBits;
     std::string deviceName;
+    bool commandVerify { false };
     inline Impl(std::shared_ptr<IOBase>* _io) : io(_io) {}
     inline std::shared_ptr<SerialPort> asSerialPort() const { return io ? std::dynamic_pointer_cast<SerialPort>(*io) : nullptr; }
 };
@@ -247,5 +248,17 @@ void Object::Attribute::setTerminalCharsEnable(bool enable) { m_impl->terminalCh
     \sa         setTerminalCharsEnable
 */
 bool Object::Attribute::terminalCharsEnable() const { return m_impl->terminalCharsEnable; }
+
+/*!
+    \brief      设置是否启用指令验证 \a enable.
+    \sa         commandVerify
+*/
+void Object::Attribute::setCommandVerify(bool enable) { m_impl->commandVerify = enable; }
+
+/*!
+    \brief      返回是否启用指令验证.
+    \sa         setCommandVerify
+*/
+bool Object::Attribute::commandVerify() const { return m_impl->commandVerify; }
 
 } // namespace OpenVisa

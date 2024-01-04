@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+<!-- StandardEventStatusRegister.qdoc -->
+  <meta name="description" content="标准事件状态寄存器.">
+  <title>StandardEventStatusRegister Struct | OpenVisa 0.13.0</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+    <div class="main">
+    <div class="main-rounded">
+        <div class="navigationbar">
+        <ul>
+<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
+<li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
+<li>StandardEventStatusRegister</li>
+<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
+    </ul>
+    </div>
+</div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3 id="toc">Contents</h3>
+<ul>
+<li class="level1"><a href="#public-variables">Public Variables</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title" translate="no">StandardEventStatusRegister Struct</h1>
+<span class="small-subtitle" translate="no">struct <a href="openvisa-module.html" translate="no">OpenVisa</a>::StandardEventStatusRegister</span>
+<!-- $$$StandardEventStatusRegister-brief -->
+<p>标准事件状态寄存器. <a href="#details">More...</a></p>
+<!-- @@@StandardEventStatusRegister -->
+<div class="table"><table class="alignedsummary" translate="no">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">  <span class="preprocessor">#include &lt;StandardEventStatusRegister.h&gt;</span></td></tr>
+</table></div>
+<ul>
+<li><a href="openvisa-standardeventstatusregister-members.html">List of all members, including inherited members</a></li>
+</ul>
+<h2 id="public-variables">Public Variables</h2>
+<div class="table"><table class="alignedsummary" translate="no">
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#commandError-var" translate="no">commandError</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#deviceError-var" translate="no">deviceError</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#executionError-var" translate="no">executionError</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#operationComplete-var" translate="no">operationComplete</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#queryError-var" translate="no">queryError</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#requestControl-var" translate="no">requestControl</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#userRequest-var" translate="no">userRequest</a></b></td></tr>
+</table></div>
+<!-- $$$StandardEventStatusRegister-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+</div>
+<!-- @@@StandardEventStatusRegister -->
+<div class="vars">
+<h2>Member Variable Documentation</h2>
+<!-- $$$commandError -->
+<h3 class="fn" translate="no" id="commandError-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">commandError</span></h3>
+<p>命令错误。显示在设备解析命令或查询时发生了错误.</p>
+<!-- @@@commandError -->
+<!-- $$$deviceError -->
+<h3 class="fn" translate="no" id="deviceError-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">deviceError</span></h3>
+<p>设备错误。显示发生了设备错误.</p>
+<!-- @@@deviceError -->
+<!-- $$$executionError -->
+<h3 class="fn" translate="no" id="executionError-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">executionError</span></h3>
+<p>执行错误。显示在执行命令或查询时发生的错误.</p>
+<!-- @@@executionError -->
+<!-- $$$operationComplete -->
+<h3 class="fn" translate="no" id="operationComplete-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">operationComplete</span></h3>
+<p>操作完成。显示该操作已完成。当按照*OPC命令完成时设置此位.</p>
+<!-- @@@operationComplete -->
+<!-- $$$queryError -->
+<h3 class="fn" translate="no" id="queryError-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">queryError</span></h3>
+<p>查询错误。在没有数据存在或挂起的数据时，要么尝试读取输出队列，或者输出队列中的数据丢失.</p>
+<!-- @@@queryError -->
+<!-- $$$requestControl -->
+<h3 class="fn" translate="no" id="requestControl-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">requestControl</span></h3>
+<p>请求控制.</p>
+<!-- @@@requestControl -->
+<!-- $$$userRequest -->
+<h3 class="fn" translate="no" id="userRequest-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">userRequest</span></h3>
+<p>已通电。显示示波器已通电。完成后，诊断自检也会设置此位.</p>
+<!-- @@@userRequest -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> OpenVisa
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/> </div>
+</body>
+</html>
