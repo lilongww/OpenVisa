@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-    <namespace>com.openvisa.0.12.0</namespace>
+    <namespace>com.openvisa.0.13.0</namespace>
     <virtualFolder>openvisa</virtualFolder>
     <metaData name="version" value=""/>
     <customFilter name="OpenVisa">
@@ -98,6 +98,7 @@
             <keyword name="OpenVisa::_9600" id="OpenVisa::_9600" ref="openvisa.html#BaudRate-enum"/>
             <keyword name="Search Results" id="Search Results" ref="search-results.html"/>
             <keyword name="SerialPortInfo" id="OpenVisa::SerialPortInfo" ref="openvisa-serialportinfo.html"/>
+            <keyword name="StandardEventStatusRegister" id="OpenVisa::StandardEventStatusRegister" ref="openvisa-standardeventstatusregister.html"/>
             <keyword name="attribute" id="Object::attribute" ref="openvisa-object.html#attribute"/>
             <keyword name="attribute" id="ObjectAdapter::attribute" ref="openvisa-objectadapter.html#attribute"/>
             <keyword name="autoAppendTerminalChars" id="Attribute::autoAppendTerminalChars" ref="openvisa-object-attribute.html#autoAppendTerminalChars"/>
@@ -105,6 +106,8 @@
             <keyword name="begin" id="BinaryArray::begin" ref="openvisa-binaryarray.html#begin"/>
             <keyword name="close" id="Object::close" ref="openvisa-object.html#close"/>
             <keyword name="cls" id="CommonCommand::cls" ref="openvisa-object-commoncommand.html#cls"/>
+            <keyword name="commandError" id="StandardEventStatusRegister::commandError" ref="openvisa-standardeventstatusregister.html#commandError-var"/>
+            <keyword name="commandVerify" id="Attribute::commandVerify" ref="openvisa-object-attribute.html#commandVerify"/>
             <keyword name="commonCommand" id="Object::commonCommand" ref="openvisa-object.html#commonCommand"/>
             <keyword name="commonCommand" id="ObjectAdapter::commonCommand" ref="openvisa-objectadapter.html#commonCommand"/>
             <keyword name="connect" id="Object::connect" ref="openvisa-object.html#connect"/>
@@ -112,11 +115,13 @@
             <keyword name="data" id="BinaryArray::data" ref="openvisa-binaryarray.html#data"/>
             <keyword name="dataBits" id="Attribute::dataBits" ref="openvisa-object-attribute.html#dataBits"/>
             <keyword name="description" id="SerialPortInfo::description" ref="openvisa-serialportinfo.html#description"/>
+            <keyword name="deviceError" id="StandardEventStatusRegister::deviceError" ref="openvisa-standardeventstatusregister.html#deviceError-var"/>
             <keyword name="deviceName" id="Attribute::deviceName" ref="openvisa-object-attribute.html#deviceName"/>
             <keyword name="empty" id="BinaryArray::empty" ref="openvisa-binaryarray.html#empty"/>
             <keyword name="end" id="BinaryArray::end" ref="openvisa-binaryarray.html#end"/>
             <keyword name="ese" id="CommonCommand::ese" ref="openvisa-object-commoncommand.html#ese"/>
             <keyword name="esr" id="CommonCommand::esr" ref="openvisa-object-commoncommand.html#esr"/>
+            <keyword name="executionError" id="StandardEventStatusRegister::executionError" ref="openvisa-standardeventstatusregister.html#executionError-var"/>
             <keyword name="firmwareRevision" id="IDN::firmwareRevision" ref="openvisa-idn.html#firmwareRevision"/>
             <keyword name="flowControl" id="Attribute::flowControl" ref="openvisa-object-attribute.html#flowControl"/>
             <keyword name="fromVisaAddressString" id="Object::fromVisaAddressString" ref="openvisa-object.html#fromVisaAddressString"/>
@@ -132,6 +137,7 @@
             <keyword name="model" id="IDN::model" ref="openvisa-idn.html#model"/>
             <keyword name="object" id="ObjectAdapter::object" ref="openvisa-objectadapter.html#object"/>
             <keyword name="opc" id="CommonCommand::opc" ref="openvisa-object-commoncommand.html#opc"/>
+            <keyword name="operationComplete" id="StandardEventStatusRegister::operationComplete" ref="openvisa-standardeventstatusregister.html#operationComplete-var"/>
             <keyword name="operator std::vector&lt;T&gt;" id="AsciiArray::operator std::vector&lt;T&gt;" ref="openvisa-asciiarray.html#operator-std-3a-3avector-ltT-gt"/>
             <keyword name="opt" id="CommonCommand::opt" ref="openvisa-object-commoncommand.html#opt"/>
             <keyword name="parity" id="Attribute::parity" ref="openvisa-object-attribute.html#parity"/>
@@ -139,12 +145,14 @@
             <keyword name="productId" id="SerialPortInfo::productId" ref="openvisa-serialportinfo.html#productId"/>
             <keyword name="query" id="Object::query" ref="openvisa-object.html#query"/>
             <keyword name="query" id="ObjectAdapter::query" ref="openvisa-objectadapter.html#query"/>
+            <keyword name="queryError" id="StandardEventStatusRegister::queryError" ref="openvisa-standardeventstatusregister.html#queryError-var"/>
             <keyword name="rcl" id="CommonCommand::rcl" ref="openvisa-object-commoncommand.html#rcl"/>
             <keyword name="read" id="Object::read" ref="openvisa-object.html#read"/>
             <keyword name="read" id="ObjectAdapter::read" ref="openvisa-objectadapter.html#read"/>
             <keyword name="readAll" id="Object::readAll" ref="openvisa-object.html#readAll"/>
             <keyword name="readAll" id="ObjectAdapter::readAll" ref="openvisa-objectadapter.html#readAll"/>
             <keyword name="removeTermChars" id="Object::removeTermChars" ref="openvisa-object.html#removeTermChars"/>
+            <keyword name="requestControl" id="StandardEventStatusRegister::requestControl" ref="openvisa-standardeventstatusregister.html#requestControl-var"/>
             <keyword name="rst" id="CommonCommand::rst" ref="openvisa-object-commoncommand.html#rst"/>
             <keyword name="send" id="Object::send" ref="openvisa-object.html#send"/>
             <keyword name="send" id="ObjectAdapter::send" ref="openvisa-objectadapter.html#send"/>
@@ -152,6 +160,7 @@
             <keyword name="serialNumber" id="SerialPortInfo::serialNumber" ref="openvisa-serialportinfo.html#serialNumber"/>
             <keyword name="setAutoAppendTerminalChars" id="Attribute::setAutoAppendTerminalChars" ref="openvisa-object-attribute.html#setAutoAppendTerminalChars"/>
             <keyword name="setBaudRate" id="Attribute::setBaudRate" ref="openvisa-object-attribute.html#setBaudRate"/>
+            <keyword name="setCommandVerify" id="Attribute::setCommandVerify" ref="openvisa-object-attribute.html#setCommandVerify"/>
             <keyword name="setDataBits" id="Attribute::setDataBits" ref="openvisa-object-attribute.html#setDataBits"/>
             <keyword name="setDeviceName" id="Attribute::setDeviceName" ref="openvisa-object-attribute.html#setDeviceName"/>
             <keyword name="setEse" id="CommonCommand::setEse" ref="openvisa-object-commoncommand.html#setEse"/>
@@ -172,6 +181,7 @@
             <keyword name="timeout" id="Attribute::timeout" ref="openvisa-object-attribute.html#timeout"/>
             <keyword name="toVisaAddressString" id="Object::toVisaAddressString" ref="openvisa-object.html#toVisaAddressString"/>
             <keyword name="tst" id="CommonCommand::tst" ref="openvisa-object-commoncommand.html#tst"/>
+            <keyword name="userRequest" id="StandardEventStatusRegister::userRequest" ref="openvisa-standardeventstatusregister.html#userRequest-var"/>
             <keyword name="vendorId" id="SerialPortInfo::vendorId" ref="openvisa-serialportinfo.html#vendorId"/>
             <keyword name="wai" id="CommonCommand::wai" ref="openvisa-object-commoncommand.html#wai"/>
             <keyword name="~Attribute" id="Attribute::~Attribute" ref="openvisa-object-attribute.html#dtor.Attribute"/>
@@ -211,6 +221,8 @@
             <file>openvisa-objectadapter.html</file>
             <file>openvisa-serialportinfo-members.html</file>
             <file>openvisa-serialportinfo.html</file>
+            <file>openvisa-standardeventstatusregister-members.html</file>
+            <file>openvisa-standardeventstatusregister.html</file>
             <file>openvisa.html</file>
             <file>search-results.html</file>
             <file>style/offline-dark.css</file>

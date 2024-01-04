@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 <!-- CommonCommand.cpp -->
   <meta name="description" content="IEEE488.2公共指令集API接口.">
-  <title>CommonCommand Class | OpenVisa 0.12.0</title>
+  <title>CommonCommand Class | OpenVisa 0.13.0</title>
   <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
   <script type="text/javascript">
     document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
@@ -26,10 +26,10 @@
     <div class="main-rounded">
         <div class="navigationbar">
         <ul>
-<li><a href="index.html" translate="no">OpenVisa 0.12.0</a></li>
+<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
 <li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
 <li>CommonCommand</li>
-<li id="buildversion">OpenVisa 0.12.0 Reference Documentation</li>
+<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
     </ul>
     </div>
 </div>
@@ -57,7 +57,7 @@
 <div class="table"><table class="alignedsummary" translate="no">
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#cls" translate="no">cls</a></b>()</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#ese" translate="no">ese</a></b>()</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#esr" translate="no">esr</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> OpenVisa::StandardEventStatusRegister </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#esr" translate="no">esr</a></b>()</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#idn" translate="no">idn</a></b>()</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#opc" translate="no">opc</a></b>()</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> std::vector&lt;std::string&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-commoncommand.html#opt" translate="no">opt</a></b>()</td></tr>
@@ -88,7 +88,7 @@
 <p><b>See also </b><a href="openvisa-object-commoncommand.html#setEse" translate="no">setEse</a>.</p>
 <!-- @@@ese -->
 <!-- $$$esr[overload1]$$$esr -->
-<h3 class="fn" translate="no" id="esr"><span class="type">int</span> CommonCommand::<span class="name">esr</span>()</h3>
+<h3 class="fn" translate="no" id="esr"><span class="type"><a href="openvisa-standardeventstatusregister.html" translate="no">OpenVisa::StandardEventStatusRegister</a></span> CommonCommand::<span class="name">esr</span>()</h3>
 <p>标准事件状态寄存器查询。 查询标准事件寄存器组的事件寄存器。 事件寄存器是只读寄存器，从条件寄存器锁存事件。 设置事件位时，将忽略与该位相对应的随后发生的事件。(*ESR?).</p>
 <!-- @@@esr -->
 <!-- $$$idn[overload1]$$$idn -->
