@@ -45,7 +45,7 @@ struct Object::Impl
     std::shared_ptr<IOBase> io;
     Attribute attr;
     CommonCommand commonCommand;
-
+    bool verified { false };
     inline Impl(Object& obj) : commonCommand(obj), attr(&io) {}
 };
 
@@ -186,7 +186,19 @@ std::string Object::readAll()
                        [&]
                        {
                            throwNoConnection();
-                           return m_impl->io->readAll();
+                           try
+                           {
+                               return m_impl->io->readAll();
+                           }
+                           catch (...)
+                           {
+                               auto error       = verifyCommand();
+                               m_impl->verified = false;
+                               if (!error.empty())
+                                   throw std::runtime_error(error);
+                               else
+                                   throw;
+                           }
                        });
 }
 
@@ -305,6 +317,13 @@ void Object::sendImpl(const std::string& scpi)
         m_impl->io->send(scpi + m_impl->attr.terminalChars());
     else
         m_impl->io->send(scpi);
+    if (m_impl->attr.commandVerify() && !scpi.contains("?")) // 非查询指令直接进行指令验证
+    {
+        auto error       = verifyCommand();
+        m_impl->verified = false;
+        if (!error.empty())
+            throw std::runtime_error(error);
+    }
 }
 
 void Object::throwNoConnection() const
@@ -313,6 +332,26 @@ void Object::throwNoConnection() const
     {
         throw std::runtime_error("Device not connected.");
     }
+}
+
+std::string Object::verifyCommand()
+{
+    if (m_impl->verified) // 中断递归死循环
+    {
+        m_impl->verified = false;
+        return {};
+    }
+    m_impl->verified = true;
+    auto esr         = this->commonCommand().esr();
+    if (esr.commandError)
+        return "Command error.";
+    else if (esr.deviceError)
+        return "Device error.";
+    else if (esr.executionError)
+        return "Execution error.";
+    else if (esr.queryError)
+        return "Query error.";
+    return {};
 }
 
 template<>

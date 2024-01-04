@@ -73,6 +73,7 @@ protected:
 private:
     void sendImpl(const std::string& scpi);
     void throwNoConnection() const;
+    std::string verifyCommand();
 
 private:
     struct Impl;

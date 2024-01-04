@@ -90,6 +90,8 @@ public:
     [[nodiscard]] std::optional<StopBits> stopBits() const;
     void setDeviceName(std::string_view name);
     [[nodiscard]] const std::string& deviceName() const;
+    void setCommandVerify(bool enable);
+    [[nodiscard]] bool commandVerify() const;
 
 protected:
     Attribute(std::shared_ptr<IOBase>* io);
