@@ -1,6 +1,6 @@
-/*********************************************************************************
+ï»¿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2023 LiLong                                              **
+**  Copyright (C) 2022-2024 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -127,7 +127,7 @@ public:
     }
     inline MessageType messageType() const { return static_cast<MessageType>(*(c_str() + 2)); }
     inline size_t payloadLength() const { return fromBigEndian(*reinterpret_cast<const size_t*>(&(c_str()[sizeof(MessageHeader) - 8]))); }
-    inline bool isEnough() const noexcept // ×Ö½ÚÊý×ã¹»
+    inline bool isEnough() const noexcept // å­—èŠ‚æ•°è¶³å¤Ÿ
     {
         if (sizeof(MessageHeader) > size())
             return false;
