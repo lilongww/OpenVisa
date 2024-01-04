@@ -71,6 +71,7 @@ void RawSocket::connect(const Address<AddressType::RawSocket>& addr, const std::
     {
         boost::asio::detail::throw_error(*error, "connect");
     }
+    m_impl->socket.set_option(boost::asio::ip::tcp::no_delay(true), *error);              // TCP-NODELAY
 }
 
 void RawSocket::send(const std::string& buffer) const
