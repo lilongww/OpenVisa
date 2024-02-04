@@ -43,6 +43,7 @@ public:
     void setFlowControl(FlowControl fc);
     void setParity(Parity p);
     void setStopBits(StopBits bits);
+    void reset() override;
 
 private:
     std::string readAllAscii() const;

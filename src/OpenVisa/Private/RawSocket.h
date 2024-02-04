@@ -39,6 +39,7 @@ public:
     void close() noexcept override;
     bool connected() const noexcept override;
     size_t avalible() const noexcept override;
+    void reset() override;
 
 private:
     std::string readAllAscii() const;

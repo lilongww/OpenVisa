@@ -192,12 +192,15 @@ std::string Object::readAll()
                            }
                            catch (...)
                            {
-                               auto error       = verifyCommand();
-                               m_impl->verified = false;
-                               if (!error.empty())
-                                   throw std::runtime_error(error);
-                               else
-                                   throw;
+                               if (m_impl->attr.commandVerify())
+                               {
+                                   m_impl->io->reset();
+                                   auto error       = verifyCommand();
+                                   m_impl->verified = false;
+                                   if (!error.empty())
+                                       throw std::runtime_error(error);
+                               }
+                               throw;
                            }
                        });
 }
