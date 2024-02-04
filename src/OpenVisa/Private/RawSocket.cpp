@@ -171,6 +171,8 @@ size_t RawSocket::avalible() const noexcept
     return m_impl->socket.is_open() ? m_impl->socket.available(e) : 0UL;
 }
 
+void RawSocket::reset() { m_impl->readBuffer.consume(m_impl->readBuffer.size()); }
+
 std::string RawSocket::readAllAscii() const
 {
     auto mutex = std::make_shared<std::timed_mutex>();

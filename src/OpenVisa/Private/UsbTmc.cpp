@@ -418,6 +418,8 @@ std::vector<OpenVisa::Address<OpenVisa::AddressType::USB>> UsbTmc::listUSB()
     return address;
 }
 
+void UsbTmc::reset() { libusb_reset_device(m_impl->handle); }
+
 void UsbTmc::init()
 {
 #if LIBUSB_API_VERSION > 0x01000109

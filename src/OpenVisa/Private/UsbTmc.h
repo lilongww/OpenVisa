@@ -37,6 +37,7 @@ public:
     // 此处 avalible 必须先调用read方法
     size_t avalible() const noexcept override;
     static std::vector<Address<AddressType::USB>> listUSB();
+    void reset() override;
 
 private:
     void init();

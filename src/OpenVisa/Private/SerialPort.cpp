@@ -207,6 +207,8 @@ void SerialPort::setStopBits(StopBits bits)
     m_impl->serialPort.set_option(boost::asio::serial_port::stop_bits { static_cast<boost::asio::serial_port::stop_bits::type>(bits) });
 }
 
+void SerialPort::reset() { m_impl->readBuffer.consume(m_impl->readBuffer.size()); }
+
 std::string SerialPort::readAllAscii() const
 {
     auto mutex = std::make_shared<std::timed_mutex>();

@@ -226,4 +226,6 @@ bool HiSLIP::connected() const noexcept { return m_impl->connected && m_impl->so
 
 size_t HiSLIP::avalible() const noexcept { return {}; }
 
+void HiSLIP::reset() { m_impl->socket.reset(); }
+
 } // namespace OpenVisa

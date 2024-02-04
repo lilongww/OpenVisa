@@ -35,8 +35,10 @@ public:
     virtual void close() noexcept                      = 0;
     virtual bool connected() const noexcept            = 0;
     virtual size_t avalible() const noexcept           = 0;
+    virtual void reset()                               = 0;
 
 protected:
     Object::Attribute const& m_attr;
 };
+
 } // namespace OpenVisa

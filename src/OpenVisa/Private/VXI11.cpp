@@ -226,6 +226,8 @@ bool VXI11::connected() const noexcept { return m_impl->connected; }
 
 size_t VXI11::avalible() const noexcept { return m_impl->avalibe; }
 
+void VXI11::reset() { m_impl->socket.reset(); }
+
 void VXI11::getPorts()
 {
     auto func = [this](int ch) -> unsigned short
