@@ -194,6 +194,7 @@ std::string Object::readAll()
                            {
                                if (m_impl->attr.commandVerify())
                                {
+                                   m_impl->io->reset();
                                    auto error       = verifyCommand();
                                    m_impl->verified = false;
                                    if (!error.empty())
