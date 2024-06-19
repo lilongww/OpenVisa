@@ -9,7 +9,7 @@
 
 由于gitee page服务已关闭，暂时无法提供在线帮助文档，请克隆仓库后，打开`doc/index.html` 查看离线API文档。
 
-现在已发布基于OpenVisa的应用程序：OpenVisaApplication，可访问地址https://gitee.com/llongww/OpenVisaApplication获取。
+现在已发布基于OpenVisa的应用程序：OpenVisaApplication，可访问地址 https://gitee.com/llongww/OpenVisaApplication 获取。
 
 ## 一、编写本项目的目的
 
