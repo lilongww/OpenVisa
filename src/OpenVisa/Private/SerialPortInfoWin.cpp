@@ -26,6 +26,16 @@ extern "C"
 #include <cfgmgr32.h>
 #include <devguid.h>
 #include <setupapi.h>
+
+#ifndef INITGUID
+#define INITGUID
+#include <guiddef.h>
+#undef INITGUID
+#else
+#include <guiddef.h>
+#endif
+
+#include <ntddmodm.h>
 }
 #include <cuchar>
 #include <regex>
@@ -124,48 +134,60 @@ static std::string _parseSerialNumber(const std::string& str)
 
 std::vector<SerialPortInfo> SerialPortInfo::listPorts()
 {
-    std::vector<SerialPortInfo> ports;
-    auto dev        = SetupDiGetClassDevsW(&GUID_DEVCLASS_PORTS, NULL, NULL, DIGCF_PRESENT);
-    int deviceIndex = 0;
-    SP_DEVINFO_DATA data;
-    data.cbSize = sizeof(data);
-    while (SetupDiEnumDeviceInfo(dev, deviceIndex, &data))
+    static const struct
     {
-        deviceIndex++;
-        const auto& portName = _portName(dev, data);
-        if (portName.contains("LPT") || portName.empty())
-            continue;
-        SerialPortInfo info;
-        info.setPortName(portName);
-        info.setDescrption(_property(dev, data, SPDRP_DEVICEDESC));
-        info.setHardwareID(_property(dev, data, SPDRP_HARDWAREID));
-        info.setManufacturer(_property(dev, data, SPDRP_MFG));
+        GUID guid;
+        DWORD flags;
+    } setupTokens[] = { { GUID_DEVCLASS_PORTS, DIGCF_PRESENT },
+                        { GUID_DEVCLASS_MODEM, DIGCF_PRESENT },
+                        { GUID_DEVINTERFACE_COMPORT, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE },
+                        { GUID_DEVINTERFACE_MODEM, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE } };
 
-        auto ident = _deviceInstanceIdentifier(data.DevInst);
-        if (auto [hasVid, vid] = _parseIdent(ident, "VID_"); hasVid)
+    std::vector<SerialPortInfo> ports;
+    auto tokens = sizeof(setupTokens) / sizeof(setupTokens[0]);
+    for (int i = 0; i < tokens; ++i)
+    {
+        auto dev        = SetupDiGetClassDevsW(&setupTokens[i].guid, NULL, NULL, setupTokens[i].flags);
+        int deviceIndex = 0;
+        SP_DEVINFO_DATA data;
+        data.cbSize = sizeof(data);
+        while (SetupDiEnumDeviceInfo(dev, deviceIndex, &data))
         {
-            info.setVendorId(vid);
-        }
-        else if (auto [hasVid, vid] = _parseIdent(ident, "VEN_"); hasVid)
-        {
-            info.setVendorId(vid);
-        }
+            deviceIndex++;
+            const auto& portName = _portName(dev, data);
+            if (portName.contains("LPT") || portName.empty())
+                continue;
+            SerialPortInfo info;
+            info.setPortName(portName);
+            info.setDescrption(_property(dev, data, SPDRP_DEVICEDESC));
+            info.setHardwareID(_property(dev, data, SPDRP_HARDWAREID));
+            info.setManufacturer(_property(dev, data, SPDRP_MFG));
 
-        if (auto [hasPid, pid] = _parseIdent(ident, "PID_"); hasPid)
-        {
-            info.setProductId(pid);
+            auto ident = _deviceInstanceIdentifier(data.DevInst);
+            if (auto [hasVid, vid] = _parseIdent(ident, "VID_"); hasVid)
+            {
+                info.setVendorId(vid);
+            }
+            else if (auto [hasVid, vid] = _parseIdent(ident, "VEN_"); hasVid)
+            {
+                info.setVendorId(vid);
+            }
+
+            if (auto [hasPid, pid] = _parseIdent(ident, "PID_"); hasPid)
+            {
+                info.setProductId(pid);
+            }
+            else if (auto [hasPid, pid] = _parseIdent(ident, "DEV_"); hasPid)
+            {
+                info.setProductId(pid);
+            }
+            info.setSerialNumber(_parseSerialNumber(ident));
+            ports.push_back(std::move(info));
         }
-        else if (auto [hasPid, pid] = _parseIdent(ident, "DEV_"); hasPid)
-        {
-            info.setProductId(pid);
-        }
-        info.setSerialNumber(_parseSerialNumber(ident));
-        ports.push_back(std::move(info));
+        SetupDiDestroyDeviceInfoList(dev);
     }
-    SetupDiDestroyDeviceInfoList(dev);
     return ports;
 }
-
 } // namespace OpenVisa
 
 #endif

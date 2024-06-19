@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.20)
-project(OpenVisa VERSION "0.13.1")
+project(OpenVisa VERSION "0.13.2")
 enable_testing()
 
 set(Boost_NO_WARN_NEW_VERSIONS 1)
