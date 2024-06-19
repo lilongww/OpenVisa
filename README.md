@@ -5,7 +5,11 @@
 ## 简介
 
 测试测量仪器通信库，包含TCP，Serial Port，USB，VXI11, HiSLIP等通信协议。
-API文档：https://llongww.gitee.io/openvisa
+~~API文档：https://llongww.gitee.io/openvisa~~
+
+由于gitee page服务已关闭，暂时无法提供在线帮助文档，请克隆仓库后，打开`doc/index.html` 查看离线API文档。
+
+现在已发布基于OpenVisa的应用程序：OpenVisaApplication，可访问地址https://gitee.com/llongww/OpenVisaApplication获取。
 
 ## 一、编写本项目的目的
 
