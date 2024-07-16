@@ -151,9 +151,8 @@ std::vector<SerialPortInfo> SerialPortInfo::listPorts()
         int deviceIndex = 0;
         SP_DEVINFO_DATA data;
         data.cbSize = sizeof(data);
-        while (SetupDiEnumDeviceInfo(dev, deviceIndex, &data))
+        while (SetupDiEnumDeviceInfo(dev, deviceIndex++, &data))
         {
-            deviceIndex++;
             const auto& portName = _portName(dev, data);
             if (portName.contains("LPT") || portName.empty())
                 continue;
@@ -186,6 +185,9 @@ std::vector<SerialPortInfo> SerialPortInfo::listPorts()
         }
         SetupDiDestroyDeviceInfoList(dev);
     }
+    std::ranges::sort(ports, [](const auto& a, const auto& b) { return a.portName() < b.portName(); });
+    auto ret = std::ranges::unique(ports, [](const auto& a, const auto& b) { return a.portName() == b.portName(); });
+    ports.erase(ret.begin(), ret.end());
     return ports;
 }
 } // namespace OpenVisa
