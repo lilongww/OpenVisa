@@ -302,9 +302,10 @@ AddressVariant Object::fromVisaAddressString(const std::string& str)
         }
         else if (tokens.at(0).starts_with("usb"))
         {
-            return Address<AddressType::USB>(static_cast<unsigned short>(std::stoul(tokens.at(1), nullptr, 16)),
-                                             static_cast<unsigned short>(std::stoul(tokens.at(2), nullptr, 16)),
-                                             tokens.at(3));
+            auto visaTokens = split(str, "::");
+            return Address<AddressType::USB>(static_cast<unsigned short>(std::stoul(visaTokens.at(1), nullptr, 16)),
+                                             static_cast<unsigned short>(std::stoul(visaTokens.at(2), nullptr, 16)),
+                                             visaTokens.at(3));
         }
     }
     catch (const std::exception&)
