@@ -101,7 +101,7 @@ visa.send("*IDN?");
 std::cout << visa.readAll();
 ```
 
-> 注意：如果安装过NI-VISA驱动库，我们无法访问NI-VISA的驱动，可以尝试安装这个驱动：https://pan.baidu.com/s/1onVU5vPZAHbREZ_zEVLA0A，提取码9dmy，或者使用Zadig将驱动程序替换为WinUSB。
+> 注意：~~如果安装过NI-VISA驱动库，我们无法访问NI-VISA的驱动，可以尝试安装这个驱动：https://pan.baidu.com/s/1onVU5vPZAHbREZ_zEVLA0A，提取码9dmy，~~或者使用[Zadig](https://zadig.akeo.ie/)将驱动程序替换为WinUSB。**现在OpenVisa支持NI的USB驱动了，并且也支持WinUSB驱动，底层代码会自动选择使用合适的驱动程序。**
 
 ### 4. VXI-11
 
@@ -172,7 +172,7 @@ auto idn = visa.query("*IDN?\n");
 
 ## 五、参考
 
-* USBTMC: [USBTMC_1_00.pdf, USBTMC_usb488_subclass_1_00.pdf](https://www.usb.org/document-library/test-measurement-class-specification)
+* USBTMC: [USBTMC_1_00.pdf, USBTMC_usb488_subclass_1_00.pdf](https://www.usb.org/document-library/test-measurement-class-specification),[IVI Interoperability Requirements for USBTMC Specification](https://www.ivifoundation.org/specifications/default.html)
 
 * VXI-11: [vxi-11.pdf](http://www.vxibus.org/specifications.html)
 

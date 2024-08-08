@@ -20,6 +20,7 @@
 #include "Attribute.h"
 #include "CommonCommand.h"
 #include "Private/HiSLIP.h"
+#include "Private/IviUsbTmc.h"
 #include "Private/OpenVisaConfig.h"
 #include "Private/RawSocket.h"
 #include "Private/SerialPort.h"
@@ -133,9 +134,18 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::USB>>(const Addres
                                                                     const std::chrono::milliseconds& commandTimeout /*= 5000*/)
 {
     m_impl->attr.setTimeout(commandTimeout);
-    auto usb = std::make_shared<UsbTmc>(m_impl->attr);
-    visaReThrow(m_impl->attr, [&] { usb->connect(addr, openTimeout); });
-    m_impl->io = usb;
+    if (std::ranges::any_of(IviUsbTmc::listUSB(), std::bind_front(std::equal_to {}, addr)))
+    {
+        auto usb = std::make_shared<IviUsbTmc>(m_impl->attr);
+        visaReThrow(m_impl->attr, [&] { usb->connect(addr, openTimeout); });
+        m_impl->io = usb;
+    }
+    else
+    {
+        auto usb = std::make_shared<UsbTmc>(m_impl->attr);
+        visaReThrow(m_impl->attr, [&] { usb->connect(addr, openTimeout); });
+        m_impl->io = usb;
+    }
     afterConnected();
 }
 
@@ -264,7 +274,12 @@ std::vector<std::string> Object::listSerialPorts()
 /*!
     \brief      列出所有USBTMC驱动设备.
 */
-std::vector<Address<AddressType::USB>> Object::listUSB() { return UsbTmc::listUSB(); }
+std::vector<Address<AddressType::USB>> Object::listUSB()
+{
+    auto vec = UsbTmc::listUSB();
+    vec.append_range(IviUsbTmc::listUSB());
+    return vec;
+}
 
 /*!
     \brief      从Visa连接描述字符串 \a str 转换为地址类型联合体.
