@@ -95,13 +95,26 @@ struct IviUsbTmc::Impl
     void write(const std::string& buffer)
     {
         DWORD writeBytes;
-        OVERLAPPED overlapped;
-        overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
+        OVERLAPPED overlapped {};
+        overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+        std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
         overlapped.Offset     = 0;
         overlapped.OffsetHigh = 0;
         WriteFile(handle, buffer.c_str(), static_cast<DWORD>(buffer.size()), &writeBytes, &overlapped);
         if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(base->m_attr.timeout().count())) == WAIT_TIMEOUT)
             throw std::runtime_error("Send timeout.");
+    }
+    void reset()
+    {
+        USBTMC_PIPE_TYPE pipeType = USBTMC_ALL_PIPES;
+        DWORD bytesReturned;
+        OVERLAPPED overlapped {};
+        overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
+        overlapped.Offset     = 0;
+        overlapped.OffsetHigh = 0;
+        if (DeviceIoControl(handle, IOCTL_USBTMC_RESET_PIPE, nullptr, 0, &pipeType, sizeof(USBTMC_PIPE_TYPE), &bytesReturned, &overlapped))
+            WaitForSingleObject(overlapped.hEvent, INFINITE);
+        CloseHandle(overlapped.hEvent);
     }
     IviUsbTmc* base;
     inline Impl(IviUsbTmc* b) : base(b) {}
@@ -158,13 +171,14 @@ std::string IviUsbTmc::read(size_t size) const
             overlapped.Offset     = 0;
             overlapped.OffsetHigh = 0;
             overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
+            std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
             ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped);
             if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(m_attr.timeout().count())) == WAIT_TIMEOUT)
             {
                 throw std::runtime_error("Read timeout.");
             }
             GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true);
-            packs.append(pack.c_str(), overlapped.InternalHigh);
+            packs.append(pack.c_str(), transfered);
         } while (!in.parse(packs, size, m_impl->tag));
         m_impl->avalible = !in.eom();
         buffer.append(std::move(in));
@@ -219,17 +233,7 @@ std::vector<Address<AddressType::USB>> IviUsbTmc::listUSB()
     return usbs;
 }
 
-void IviUsbTmc::reset()
-{
-    USBTMC_PIPE_TYPE pipeType = USBTMC_ALL_PIPES;
-    DWORD bytesReturned;
-    OVERLAPPED overlapped {};
-    overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (!DeviceIoControl(
-            m_impl->handle, IOCTL_USBTMC_RESET_PIPE, nullptr, 0, &pipeType, sizeof(USBTMC_PIPE_TYPE), &bytesReturned, &overlapped))
-        throw std::runtime_error(getLastError());
-    WaitForSingleObject(overlapped.hEvent, INFINITE);
-}
+void IviUsbTmc::reset() {}
 
 void IviUsbTmc::init() {}
 
