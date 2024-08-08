@@ -33,6 +33,24 @@ DEFINE_GUID(UsbTmcGuid, 0xA9FDBB24L, 0x128A, 0x11d5, 0x99, 0x61, 0x00, 0x10, 0x8
 constexpr auto UsbTmcDevClassName = "USB Test and Measurement Devices";
 constexpr auto PacketSize         = 8 * 1024;
 
+enum USBTMC_IOCTL
+{
+    IOCTL_USBTMC_GETINFO        = 0x80002000,
+    IOCTL_USBTMC_CANCEL_IO      = 0x80002004,
+    IOCTL_USBTMC_WAIT_INTERRUPT = 0x80002008,
+    IOCTL_USBTMC_RESET_PIPE     = 0x8000201C,
+    IOCTL_USBTMC_SEND_REQUEST   = 0x80002080,
+    IOCTL_USBTMC_GET_LAST_ERROR = 0x80002088
+};
+
+enum USBTMC_PIPE_TYPE
+{
+    USBTMC_INTERRUPT_IN_PIPE = 1,
+    USBTMC_READ_DATA_PIPE    = 2,
+    USBTMC_WRITE_DATA_PIPE   = 3,
+    USBTMC_ALL_PIPES         = 4
+};
+
 static std::string getPath(const Address<AddressType::USB>& addr)
 {
     return std::format("\\\\?\\usb#vid_{:04x}&pid_{:04x}#{}#{}",
@@ -140,10 +158,8 @@ std::string IviUsbTmc::read(size_t size) const
             overlapped.Offset     = 0;
             overlapped.OffsetHigh = 0;
             overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
-            if (ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped))
-            {
-            }
-            else if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(m_attr.timeout().count())) == WAIT_TIMEOUT)
+            ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped);
+            if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(m_attr.timeout().count())) == WAIT_TIMEOUT)
             {
                 throw std::runtime_error("Read timeout.");
             }
@@ -161,6 +177,7 @@ void IviUsbTmc::close() noexcept
     if (m_impl->handle)
     {
         CloseHandle(m_impl->handle);
+        m_impl->handle = nullptr;
     }
 }
 
@@ -202,7 +219,17 @@ std::vector<Address<AddressType::USB>> IviUsbTmc::listUSB()
     return usbs;
 }
 
-void IviUsbTmc::reset() {}
+void IviUsbTmc::reset()
+{
+    USBTMC_PIPE_TYPE pipeType = USBTMC_ALL_PIPES;
+    DWORD bytesReturned;
+    OVERLAPPED overlapped {};
+    overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (!DeviceIoControl(
+            m_impl->handle, IOCTL_USBTMC_RESET_PIPE, nullptr, 0, &pipeType, sizeof(USBTMC_PIPE_TYPE), &bytesReturned, &overlapped))
+        throw std::runtime_error(getLastError());
+    WaitForSingleObject(overlapped.hEvent, INFINITE);
+}
 
 void IviUsbTmc::init() {}
 
