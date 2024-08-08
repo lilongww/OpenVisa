@@ -20,6 +20,7 @@
 
 #include "IOBase.h"
 
+#ifdef WIN32
 namespace OpenVisa
 {
 class IviUsbTmc : public IOBase
@@ -47,3 +48,4 @@ private:
     std::unique_ptr<Impl> m_impl;
 };
 } // namespace OpenVisa
+#endif

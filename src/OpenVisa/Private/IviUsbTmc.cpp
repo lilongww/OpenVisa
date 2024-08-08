@@ -17,6 +17,7 @@
 **  along with OpenVisa.  If not, see <https://www.gnu.org/licenses/>.          **
 **********************************************************************************/
 #include "IviUsbTmc.h"
+#ifdef WIN32
 #include "SerialPortInfoWin.h"
 #include "UsbTmcProtocol.h"
 
@@ -65,22 +66,37 @@ struct IviUsbTmc::Impl
 {
     HANDLE handle { nullptr };
     uint8_t tag { 0 };
+    bool avalible { false };
+
     void updateTag()
     {
         ++tag;
         if (tag == 0)
             ++tag;
     }
-    bool avalible { false };
+    void write(const std::string& buffer)
+    {
+        DWORD writeBytes;
+        OVERLAPPED overlapped;
+        overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
+        overlapped.Offset     = 0;
+        overlapped.OffsetHigh = 0;
+        WriteFile(handle, buffer.c_str(), static_cast<DWORD>(buffer.size()), &writeBytes, &overlapped);
+        if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(base->m_attr.timeout().count())) == WAIT_TIMEOUT)
+            throw std::runtime_error("Send timeout.");
+    }
+    IviUsbTmc* base;
+    inline Impl(IviUsbTmc* b) : base(b) {}
 };
 
-IviUsbTmc::IviUsbTmc(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>()) { init(); }
+IviUsbTmc::IviUsbTmc(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>(this)) { init(); }
 
 IviUsbTmc::~IviUsbTmc() {}
 
 void IviUsbTmc::connect(const Address<AddressType::USB>& addr, const std::chrono::milliseconds& openTimeout)
 {
-    auto handle = CreateFileA(getPath(addr).c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    auto handle = CreateFileA(
+        getPath(addr).c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
     if (handle == INVALID_HANDLE_VALUE)
     {
         throw std::exception("Open Usb failed.");
@@ -93,20 +109,10 @@ void IviUsbTmc::send(const std::string& buffer) const
     m_impl->updateTag();
     BulkOut bo(m_impl->tag, USBTMC_MSGID_DEV_DEP_MSG_OUT, PacketSize);
     bo.append(buffer);
-
     auto&& msgs = static_cast<std::vector<std::string>>(bo);
-
-    DWORD writeBytes;
-    OVERLAPPED overlapped;
-    overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
-    overlapped.Offset     = 0;
-    overlapped.OffsetHigh = 0;
     for (auto&& msg : msgs)
     {
-        if (!WriteFile(m_impl->handle, msg.c_str(), static_cast<DWORD>(msg.size()), &writeBytes, nullptr))
-        {
-            throw std::runtime_error(getLastError());
-        }
+        m_impl->write(msg);
     }
 }
 
@@ -124,20 +130,25 @@ std::string IviUsbTmc::read(size_t size) const
         m_impl->updateTag();
         { // req
             std::string requrestBuffer = BulkRequest(m_impl->tag, static_cast<unsigned int>(size - buffer.size()));
-            if (!WriteFile(m_impl->handle, requrestBuffer.c_str(), static_cast<DWORD>(requrestBuffer.size()), nullptr, nullptr))
-            {
-                throw std::runtime_error(getLastError());
-            }
+            m_impl->write(requrestBuffer);
         }
         do
         {
             std::string pack;
             pack.resize(PacketSize);
-            if (!ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, nullptr))
+            OVERLAPPED overlapped {};
+            overlapped.Offset     = 0;
+            overlapped.OffsetHigh = 0;
+            overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
+            if (ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped))
             {
-                throw std::runtime_error(getLastError());
             }
-            packs.append(pack.c_str(), transfered);
+            else if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(m_attr.timeout().count())) == WAIT_TIMEOUT)
+            {
+                throw std::runtime_error("Read timeout.");
+            }
+            GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true);
+            packs.append(pack.c_str(), overlapped.InternalHigh);
         } while (!in.parse(packs, size, m_impl->tag));
         m_impl->avalible = !in.eom();
         buffer.append(std::move(in));
@@ -196,3 +207,4 @@ void IviUsbTmc::reset() {}
 void IviUsbTmc::init() {}
 
 } // namespace OpenVisa
+#endif

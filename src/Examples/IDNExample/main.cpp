@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
         //    obj.send("MMEMory:DATA '1.txt',#{}{}{}", str.size(), str, buffer);
         // obj.send(":SENSe1:SWEep:POINts?");
         // std::cout << obj.readAll() << std::endl;
-        std::cout << obj.query("*IDN?");
+        for (int i = 0; i < 10000; i++)
+            std::cout << obj.query("*IDN?");
     }
     catch (const std::exception& e)
     {
