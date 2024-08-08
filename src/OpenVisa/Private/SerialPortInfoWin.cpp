@@ -16,27 +16,12 @@
 **  You should have received a copy of the GNU Lesser General Public License    **
 **  along with OpenVisa.  If not, see <https://www.gnu.org/licenses/>.          **
 **********************************************************************************/
-#ifdef WIN32
 
+#include "SerialPortInfoWin.h"
+
+#ifdef WIN32
 #include "../SerialPortInfo.h"
 
-extern "C"
-{
-#include <Windows.h>
-#include <cfgmgr32.h>
-#include <devguid.h>
-#include <setupapi.h>
-
-#ifndef INITGUID
-#define INITGUID
-#include <guiddef.h>
-#undef INITGUID
-#else
-#include <guiddef.h>
-#endif
-
-#include <ntddmodm.h>
-}
 #include <cuchar>
 #include <regex>
 #include <tuple>
@@ -67,7 +52,7 @@ static std::string _portName(const HDEVINFO& dev, SP_DEVINFO_DATA& data)
     return {};
 }
 
-static std::string _property(const HDEVINFO& dev, SP_DEVINFO_DATA& data, DWORD property)
+std::string _property(const HDEVINFO& dev, SP_DEVINFO_DATA& data, DWORD property)
 {
     wchar_t str[MAX_PATH];
     DWORD len = MAX_PATH;
@@ -79,7 +64,7 @@ static std::string _property(const HDEVINFO& dev, SP_DEVINFO_DATA& data, DWORD p
     return {};
 }
 
-static std::string _deviceInstanceIdentifier(DEVINST deviceInstanceNumber)
+std::string _deviceInstanceIdentifier(DWORD deviceInstanceNumber)
 {
     wchar_t outputBuffer[MAX_DEVICE_ID_LEN + 1] {};
     if (CM_Get_Device_IDW(deviceInstanceNumber, &outputBuffer[0], MAX_DEVICE_ID_LEN, 0) != CR_SUCCESS)
@@ -89,7 +74,7 @@ static std::string _deviceInstanceIdentifier(DEVINST deviceInstanceNumber)
     return toString(outputBuffer, std::wcslen(outputBuffer));
 }
 
-static std::tuple<bool, unsigned short> _parseIdent(const std::string& str, const std::string& pattern)
+std::tuple<bool, unsigned short> _parseIdent(const std::string& str, const std::string& pattern)
 {
     auto index = str.find(pattern);
     if (index != std::string::npos)
@@ -105,7 +90,7 @@ static std::tuple<bool, unsigned short> _parseIdent(const std::string& str, cons
     return { false, 0 };
 }
 
-static std::string _parseSerialNumber(const std::string& str)
+std::string _parseSerialNumber(const std::string& str)
 {
     auto firstbound = str.find_last_of('\\');
     auto lastbound  = str.find_first_of('_', firstbound);
