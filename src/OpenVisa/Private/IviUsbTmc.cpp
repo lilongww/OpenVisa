@@ -33,6 +33,32 @@ DEFINE_GUID(UsbTmcGuid, 0xA9FDBB24L, 0x128A, 0x11d5, 0x99, 0x61, 0x00, 0x10, 0x8
 constexpr auto UsbTmcDevClassName = "USB Test and Measurement Devices";
 constexpr auto PacketSize         = 8 * 1024;
 
+enum USBTMC_IOCTL : DWORD
+{
+    IOCTL_USBTMC_GETINFO        = 0x80002000,
+    IOCTL_USBTMC_CANCEL_IO      = 0x80002004,
+    IOCTL_USBTMC_WAIT_INTERRUPT = 0x80002008,
+    IOCTL_USBTMC_RESET_PIPE     = 0x8000201C,
+    IOCTL_USBTMC_SEND_REQUEST   = 0x80002080,
+    IOCTL_USBTMC_GET_LAST_ERROR = 0x80002088
+};
+
+enum USBTMC_PIPE_TYPE
+{
+    USBTMC_INTERRUPT_IN_PIPE = 1,
+    USBTMC_READ_DATA_PIPE    = 2,
+    USBTMC_WRITE_DATA_PIPE   = 3,
+    USBTMC_ALL_PIPES         = 4
+};
+
+struct USBTMC_DRV_INFO
+{
+    DWORD major;            // major revision of driver
+    DWORD minor;            // minor revision of driver
+    DWORD build;            // internal build number
+    WCHAR manufacturer[64]; // unicode manufacturer string
+};
+
 static std::string getPath(const Address<AddressType::USB>& addr)
 {
     return std::format("\\\\?\\usb#vid_{:04x}&pid_{:04x}#{}#{}",
@@ -62,6 +88,18 @@ static std::string getLastError()
     return "Unknown error.";
 }
 
+static void wait(const OVERLAPPED& overlapped, const std::chrono::milliseconds& timeout)
+{
+    auto ret = WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(timeout.count()));
+    switch (ret)
+    {
+    case WAIT_TIMEOUT:
+        throw std::runtime_error("Send timeout.");
+    case WAIT_FAILED:
+        throw std::runtime_error(getLastError());
+    }
+}
+
 struct IviUsbTmc::Impl
 {
     HANDLE handle { nullptr };
@@ -77,14 +115,51 @@ struct IviUsbTmc::Impl
     void write(const std::string& buffer)
     {
         DWORD writeBytes;
-        OVERLAPPED overlapped;
-        overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
+        OVERLAPPED overlapped {};
+        overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+        std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
         overlapped.Offset     = 0;
         overlapped.OffsetHigh = 0;
         WriteFile(handle, buffer.c_str(), static_cast<DWORD>(buffer.size()), &writeBytes, &overlapped);
-        if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(base->m_attr.timeout().count())) == WAIT_TIMEOUT)
-            throw std::runtime_error("Send timeout.");
+        wait(overlapped, base->m_attr.timeout());
+        DWORD transferred;
+        if (!GetOverlappedResult(handle, &overlapped, &transferred, true))
+        {
+            CloseHandle(handle);
+            handle = nullptr;
+            throw std::runtime_error(getLastError());
+        }
     }
+
+    void reset(USBTMC_PIPE_TYPE pipeType)
+    {
+        DWORD cbRet = 0;
+        OVERLAPPED overlapped;
+        memset(&overlapped, 0, sizeof(OVERLAPPED));
+        overlapped.hEvent = CreateEvent(NULL,  // pointer to security attributes
+                                        FALSE, // automatic reset
+                                        FALSE, // initialize to nosignaled
+                                        NULL); // pointer to the event-object name
+        if (DeviceIoControl(handle, IOCTL_USBTMC_RESET_PIPE, &pipeType, sizeof(USBTMC_PIPE_TYPE), nullptr, 0, &cbRet, &overlapped))
+            WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(base->m_attr.timeout().count()));
+        CloseHandle(overlapped.hEvent);
+    }
+
+    USBTMC_DRV_INFO getInfo()
+    {
+        USBTMC_DRV_INFO drvrInfo;
+        DWORD cbRet;
+        BOOL bRet;
+        OVERLAPPED overlapped {};
+        memset(&overlapped, 0, sizeof(OVERLAPPED));
+        overlapped.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+        bRet              = DeviceIoControl(handle, IOCTL_USBTMC_GETINFO, NULL, 0, &drvrInfo, sizeof(USBTMC_DRV_INFO), &cbRet, &overlapped);
+        if (bRet == TRUE)
+            WaitForSingleObject(overlapped.hEvent, INFINITE);
+        CloseHandle(overlapped.hEvent);
+        return drvrInfo;
+    }
+
     IviUsbTmc* base;
     inline Impl(IviUsbTmc* b) : base(b) {}
 };
@@ -140,15 +215,12 @@ std::string IviUsbTmc::read(size_t size) const
             overlapped.Offset     = 0;
             overlapped.OffsetHigh = 0;
             overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
-            if (ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped))
-            {
-            }
-            else if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(m_attr.timeout().count())) == WAIT_TIMEOUT)
-            {
-                throw std::runtime_error("Read timeout.");
-            }
-            GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true);
-            packs.append(pack.c_str(), overlapped.InternalHigh);
+            std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
+            ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped);
+            wait(overlapped, m_attr.timeout());
+            if (!GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true))
+                throw std::runtime_error(getLastError());
+            packs.append(pack.c_str(), transfered);
         } while (!in.parse(packs, size, m_impl->tag));
         m_impl->avalible = !in.eom();
         buffer.append(std::move(in));
@@ -161,6 +233,7 @@ void IviUsbTmc::close() noexcept
     if (m_impl->handle)
     {
         CloseHandle(m_impl->handle);
+        m_impl->handle = nullptr;
     }
 }
 
@@ -202,7 +275,11 @@ std::vector<Address<AddressType::USB>> IviUsbTmc::listUSB()
     return usbs;
 }
 
-void IviUsbTmc::reset() {}
+void IviUsbTmc::reset()
+{
+    m_impl->reset(USBTMC_READ_DATA_PIPE);
+    m_impl->reset(USBTMC_WRITE_DATA_PIPE);
+}
 
 void IviUsbTmc::init() {}
 
