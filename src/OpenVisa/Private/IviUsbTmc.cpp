@@ -80,6 +80,18 @@ static std::string getLastError()
     return "Unknown error.";
 }
 
+static void wait(const OVERLAPPED& overlapped, const std::chrono::milliseconds& timeout)
+{
+    auto ret = WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(timeout.count()));
+    switch (ret)
+    {
+    case WAIT_TIMEOUT:
+        throw std::runtime_error("Send timeout.");
+    case WAIT_FAILED:
+        throw std::runtime_error(getLastError());
+    }
+}
+
 struct IviUsbTmc::Impl
 {
     HANDLE handle { nullptr };
@@ -101,8 +113,12 @@ struct IviUsbTmc::Impl
         overlapped.Offset     = 0;
         overlapped.OffsetHigh = 0;
         WriteFile(handle, buffer.c_str(), static_cast<DWORD>(buffer.size()), &writeBytes, &overlapped);
-        if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(base->m_attr.timeout().count())) == WAIT_TIMEOUT)
-            throw std::runtime_error("Send timeout.");
+        wait(overlapped, base->m_attr.timeout());
+        DWORD transferred;
+        if (!GetOverlappedResult(handle, &overlapped, &transferred, true))
+        {
+            throw std::runtime_error(getLastError());
+        }
     }
     void reset()
     {
@@ -116,6 +132,7 @@ struct IviUsbTmc::Impl
             WaitForSingleObject(overlapped.hEvent, INFINITE);
         CloseHandle(overlapped.hEvent);
     }
+
     IviUsbTmc* base;
     inline Impl(IviUsbTmc* b) : base(b) {}
 };
@@ -173,11 +190,9 @@ std::string IviUsbTmc::read(size_t size) const
             overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
             std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
             ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped);
-            if (WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(m_attr.timeout().count())) == WAIT_TIMEOUT)
-            {
-                throw std::runtime_error("Read timeout.");
-            }
-            GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true);
+            wait(overlapped, m_attr.timeout());
+            if (!GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true))
+                throw std::runtime_error(getLastError());
             packs.append(pack.c_str(), transfered);
         } while (!in.parse(packs, size, m_impl->tag));
         m_impl->avalible = !in.eom();

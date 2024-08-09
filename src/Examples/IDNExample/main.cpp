@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
         // obj.connect(OpenVisa::Address<OpenVisa::AddressType::HiSLIP>("192.168.2.111"));
         // obj.connect(OpenVisa::Address<OpenVisa::AddressType::VXI11>("192.168.2.111", "inst0"));
         // obj.connect("TCPIP::192.168.2.111::INSTR");
-        obj.connect("USB::0X0471::0X2878::T9-923-00743::INSTR");
+        obj.connect("USB::0XF4EC::0X1101::SDG6XFCQ7R0609::INSTR");
         obj.attribute().setDeviceName("ZNA 43");
         // const char* str = "TCPIP::192.168.2.111::INSTR";
         //  obj.connect(str);
