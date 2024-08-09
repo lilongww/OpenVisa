@@ -33,7 +33,7 @@ DEFINE_GUID(UsbTmcGuid, 0xA9FDBB24L, 0x128A, 0x11d5, 0x99, 0x61, 0x00, 0x10, 0x8
 constexpr auto UsbTmcDevClassName = "USB Test and Measurement Devices";
 constexpr auto PacketSize         = 8 * 1024;
 
-enum USBTMC_IOCTL
+enum USBTMC_IOCTL : DWORD
 {
     IOCTL_USBTMC_GETINFO        = 0x80002000,
     IOCTL_USBTMC_CANCEL_IO      = 0x80002004,
@@ -49,6 +49,14 @@ enum USBTMC_PIPE_TYPE
     USBTMC_READ_DATA_PIPE    = 2,
     USBTMC_WRITE_DATA_PIPE   = 3,
     USBTMC_ALL_PIPES         = 4
+};
+
+struct USBTMC_DRV_INFO
+{
+    DWORD major;            // major revision of driver
+    DWORD minor;            // minor revision of driver
+    DWORD build;            // internal build number
+    WCHAR manufacturer[64]; // unicode manufacturer string
 };
 
 static std::string getPath(const Address<AddressType::USB>& addr)
@@ -117,20 +125,39 @@ struct IviUsbTmc::Impl
         DWORD transferred;
         if (!GetOverlappedResult(handle, &overlapped, &transferred, true))
         {
+            CloseHandle(handle);
+            handle = nullptr;
             throw std::runtime_error(getLastError());
         }
     }
-    void reset()
+
+    void reset(USBTMC_PIPE_TYPE pipeType)
     {
-        USBTMC_PIPE_TYPE pipeType = USBTMC_ALL_PIPES;
-        DWORD bytesReturned;
+        DWORD cbRet = 0;
+        OVERLAPPED overlapped;
+        memset(&overlapped, 0, sizeof(OVERLAPPED));
+        overlapped.hEvent = CreateEvent(NULL,  // pointer to security attributes
+                                        FALSE, // automatic reset
+                                        FALSE, // initialize to nosignaled
+                                        NULL); // pointer to the event-object name
+        if (DeviceIoControl(handle, IOCTL_USBTMC_RESET_PIPE, &pipeType, sizeof(USBTMC_PIPE_TYPE), nullptr, 0, &cbRet, &overlapped))
+            WaitForSingleObject(overlapped.hEvent, static_cast<DWORD>(base->m_attr.timeout().count()));
+        CloseHandle(overlapped.hEvent);
+    }
+
+    USBTMC_DRV_INFO getInfo()
+    {
+        USBTMC_DRV_INFO drvrInfo;
+        DWORD cbRet;
+        BOOL bRet;
         OVERLAPPED overlapped {};
-        overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
-        overlapped.Offset     = 0;
-        overlapped.OffsetHigh = 0;
-        if (DeviceIoControl(handle, IOCTL_USBTMC_RESET_PIPE, nullptr, 0, &pipeType, sizeof(USBTMC_PIPE_TYPE), &bytesReturned, &overlapped))
+        memset(&overlapped, 0, sizeof(OVERLAPPED));
+        overlapped.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+        bRet              = DeviceIoControl(handle, IOCTL_USBTMC_GETINFO, NULL, 0, &drvrInfo, sizeof(USBTMC_DRV_INFO), &cbRet, &overlapped);
+        if (bRet == TRUE)
             WaitForSingleObject(overlapped.hEvent, INFINITE);
         CloseHandle(overlapped.hEvent);
+        return drvrInfo;
     }
 
     IviUsbTmc* base;
@@ -248,7 +275,11 @@ std::vector<Address<AddressType::USB>> IviUsbTmc::listUSB()
     return usbs;
 }
 
-void IviUsbTmc::reset() {}
+void IviUsbTmc::reset()
+{
+    m_impl->reset(USBTMC_READ_DATA_PIPE);
+    m_impl->reset(USBTMC_WRITE_DATA_PIPE);
+}
 
 void IviUsbTmc::init() {}
 
