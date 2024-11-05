@@ -151,7 +151,7 @@ void Object::Attribute::setBaudRate(unsigned int baud)
 }
 
 /*!
-    \brief      返回波特率, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
+    \brief      返回波特率, 仅串口连接时有效，默认为9600.
     \sa
 */
 unsigned int Object::Attribute::baudRate() const { return m_impl->baud; }
@@ -168,7 +168,7 @@ void Object::Attribute::setDataBits(DataBits bits)
 }
 
 /*!
-    \brief      返回数据位, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
+    \brief      返回数据位, 仅串口连接时有效, 默认为 DataBits::Data8.
     \sa         setDataBits
 */
 DataBits Object::Attribute::dataBits() const { return m_impl->dataBits; }
@@ -185,7 +185,7 @@ void Object::Attribute::setFlowControl(FlowControl fc)
 }
 
 /*!
-    \brief      返回流控制, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
+    \brief      返回流控制, 仅串口连接时有效，默认为 FlowControl::None.
     \sa         setFlowControl
 */
 FlowControl Object::Attribute::flowControl() const { return m_impl->flowControl; }
@@ -202,13 +202,13 @@ void Object::Attribute::setParity(Parity p)
 }
 
 /*!
-    \brief      返回校验规则, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
+    \brief      返回校验规则, 仅串口连接时有效，默认为 Parity::None.
     \sa         setParity
 */
 Parity Object::Attribute::parity() const { return m_impl->parity; }
 
 /*!
-    \brief      返回停止位, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
+    \brief      返回停止位, 仅串口连接时有效，默认为 StopBits::One.
     \sa         setStopBits
 */
 StopBits Object::Attribute::stopBits() const { return m_impl->stopBits; }
