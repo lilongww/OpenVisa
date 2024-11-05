@@ -21,7 +21,6 @@
 #include "CommonCommand.h"
 #include "Private/HiSLIP.h"
 #include "Private/IviUsbTmc.h"
-#include "Private/OpenVisaConfig.h"
 #include "Private/RawSocket.h"
 #include "Private/SerialPort.h"
 #include "Private/UsbTmc.h"
@@ -312,12 +311,14 @@ AddressVariant Object::fromVisaAddressString(const std::string& str)
         {
             std::string temp;
             std::ranges::copy(tokens.at(0) | std::views::filter([](auto ch) { return ch >= '0' && ch <= '9'; }), std::back_inserter(temp));
-            auto opt = OpenVisa::OpenVisaConfig::instance().fromAsrl(static_cast<unsigned long>(std::stoul(temp)));
-            return opt ? AddressVariant { Address<AddressType::SerialPort>(opt->portName) } : std::monostate {};
+            auto port = std::stoul(temp);
+            return AddressVariant { Address<AddressType::SerialPort>(std::format("COM{}", port)) };
         }
         else if (tokens.at(0).starts_with("usb"))
         {
-            auto visaTokens = split(str, "::");
+            auto visaTokens = split(addr, "::");
+            if (visaTokens.size() == 5 && !visaTokens[4].ends_with("instr"))
+                return std::monostate {};
             return Address<AddressType::USB>(static_cast<unsigned short>(std::stoul(visaTokens.at(1), nullptr, 16)),
                                              static_cast<unsigned short>(std::stoul(visaTokens.at(2), nullptr, 16)),
                                              visaTokens.at(3));
@@ -395,8 +396,20 @@ template<>
 OPENVISA_EXPORT static std::string Object::toVisaAddressString<Address<AddressType::SerialPort>>(
     const Address<AddressType::SerialPort>& addr)
 {
-    auto asrl = OpenVisaConfig::instance().toAsrl(addr.portName());
-    return asrl ? std::format("ASRL{}::INSTR", *asrl) : std::string {};
+    if (!addr.portName().starts_with("COM") && !addr.portName().starts_with("com"))
+        return {};
+
+    std::string temp;
+    std::ranges::copy(addr.portName() | std::views::filter([](auto ch) { return ch >= '0' && ch <= '9'; }), std::back_inserter(temp));
+    try
+    {
+        auto port = std::stoul(temp);
+        return std::format("ASRL{}::INSTR", port);
+    }
+    catch (...)
+    {
+        return {};
+    }
 }
 
 template<>

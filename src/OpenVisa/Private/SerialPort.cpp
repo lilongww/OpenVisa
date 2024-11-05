@@ -17,7 +17,6 @@
 **  along with OpenVisa.  If not, see <https://www.gnu.org/licenses/>.          **
 **********************************************************************************/
 #include "SerialPort.h"
-#include "OpenVisaConfig.h"
 
 #include <boost/asio.hpp>
 #ifdef WIN32
@@ -56,15 +55,12 @@ SerialPort::~SerialPort() noexcept
 
 void SerialPort::connect(const Address<AddressType::SerialPort>& addr, const std::chrono::milliseconds& openTimeout)
 {
-    auto asrlId      = OpenVisaConfig::instance().toAsrl(addr.portName());
-    const auto& asrl = asrlId ? OpenVisaConfig::instance().fromAsrl(*asrlId) : std::nullopt;
-
     m_impl->serialPort.open(addr.portName());
-    setBaudRate(m_attr.baudRate() ? *m_attr.baudRate() : asrl ? asrl->baud : 9600);
-    setDataBits(m_attr.dataBits() ? *m_attr.dataBits() : asrl ? asrl->dataBits : DataBits::Data8);
-    setFlowControl(m_attr.flowControl() ? *m_attr.flowControl() : asrl ? asrl->flowControl : FlowControl::None);
-    setParity(m_attr.parity() ? *m_attr.parity() : asrl ? asrl->parity : Parity::None);
-    setStopBits(m_attr.stopBits() ? *m_attr.stopBits() : asrl ? asrl->stopBits : StopBits::One);
+    setBaudRate(m_attr.baudRate());
+    setDataBits(m_attr.dataBits());
+    setFlowControl(m_attr.flowControl());
+    setParity(m_attr.parity());
+    setStopBits(m_attr.stopBits());
 }
 
 void SerialPort::send(const std::string& buffer) const

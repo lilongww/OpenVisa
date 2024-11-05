@@ -28,11 +28,11 @@ struct Object::Attribute::Impl
     bool terminalCharsEnable { true };
     std::chrono::milliseconds timeout { 2000 };
     bool autoAppendTerminalChars { true };
-    std::optional<unsigned int> baud;
-    std::optional<DataBits> dataBits;
-    std::optional<FlowControl> flowControl;
-    std::optional<Parity> parity;
-    std::optional<StopBits> stopBits;
+    unsigned int baud { 9600 };
+    DataBits dataBits { DataBits::Data8 };
+    FlowControl flowControl { FlowControl::None };
+    Parity parity { Parity::None };
+    StopBits stopBits { StopBits::One };
     std::string deviceName;
     bool commandVerify { false };
     inline Impl(std::shared_ptr<IOBase>* _io) : io(_io) {}
@@ -154,7 +154,7 @@ void Object::Attribute::setBaudRate(unsigned int baud)
     \brief      返回波特率, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
     \sa
 */
-std::optional<unsigned int> Object::Attribute::baudRate() const { return m_impl->baud; }
+unsigned int Object::Attribute::baudRate() const { return m_impl->baud; }
 
 /*!
     \brief      设置数据位 \a bits, 仅串口连接时有效.
@@ -171,7 +171,7 @@ void Object::Attribute::setDataBits(DataBits bits)
     \brief      返回数据位, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
     \sa         setDataBits
 */
-std::optional<DataBits> Object::Attribute::dataBits() const { return m_impl->dataBits; }
+DataBits Object::Attribute::dataBits() const { return m_impl->dataBits; }
 
 /*!
     \brief      设置流控制 \a fc, 仅串口连接时有效.
@@ -188,7 +188,7 @@ void Object::Attribute::setFlowControl(FlowControl fc)
     \brief      返回流控制, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
     \sa         setFlowControl
 */
-std::optional<FlowControl> Object::Attribute::flowControl() const { return m_impl->flowControl; }
+FlowControl Object::Attribute::flowControl() const { return m_impl->flowControl; }
 
 /*!
     \brief      设置校验规则 \a p, 仅串口连接时有效.
@@ -205,13 +205,13 @@ void Object::Attribute::setParity(Parity p)
     \brief      返回校验规则, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
     \sa         setParity
 */
-std::optional<Parity> Object::Attribute::parity() const { return m_impl->parity; }
+Parity Object::Attribute::parity() const { return m_impl->parity; }
 
 /*!
     \brief      返回停止位, 仅串口连接时有效，如果没有设置则返回 std::nullopt.
     \sa         setStopBits
 */
-std::optional<StopBits> Object::Attribute::stopBits() const { return m_impl->stopBits; }
+StopBits Object::Attribute::stopBits() const { return m_impl->stopBits; }
 
 /*!
     \brief      设置停止位 \a bits, 仅串口连接时有效.
