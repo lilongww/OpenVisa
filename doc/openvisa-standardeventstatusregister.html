@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 <!-- StandardEventStatusRegister.qdoc -->
   <meta name="description" content="标准事件状态寄存器.">
-  <title>StandardEventStatusRegister Struct | OpenVisa 0.13.0</title>
+  <title>StandardEventStatusRegister Struct | OpenVisa 0.15.0</title>
   <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
   <script type="text/javascript">
     document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
@@ -26,10 +26,10 @@
     <div class="main-rounded">
         <div class="navigationbar">
         <ul>
-<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
+<li><a href="index.html">OpenVisa 0.15.0</a></li>
 <li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
 <li>StandardEventStatusRegister</li>
-<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
+<li id="buildversion">OpenVisa 0.15.0 Reference Documentation</li>
     </ul>
     </div>
 </div>
@@ -50,8 +50,8 @@
 <!-- $$$StandardEventStatusRegister-brief -->
 <p>标准事件状态寄存器. <a href="#details">More...</a></p>
 <!-- @@@StandardEventStatusRegister -->
-<div class="table"><table class="alignedsummary" translate="no">
-<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">  <span class="preprocessor">#include &lt;StandardEventStatusRegister.h&gt;</span></td></tr>
+<div class="table"><table class="alignedsummary requisites" translate="no">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign"> <code translate="no">#include &lt;StandardEventStatusRegister.h&gt;</code></td></tr>
 </table></div>
 <ul>
 <li><a href="openvisa-standardeventstatusregister-members.html">List of all members, including inherited members</a></li>
@@ -62,6 +62,7 @@
 <tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#deviceError-var" translate="no">deviceError</a></b></td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#executionError-var" translate="no">executionError</a></b></td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#operationComplete-var" translate="no">operationComplete</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#powerOn-var" translate="no">powerOn</a></b></td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#queryError-var" translate="no">queryError</a></b></td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#requestControl-var" translate="no">requestControl</a></b></td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> uint8_t </td><td class="memItemRight bottomAlign"><b><a href="openvisa-standardeventstatusregister.html#userRequest-var" translate="no">userRequest</a></b></td></tr>
@@ -89,6 +90,10 @@
 <h3 class="fn" translate="no" id="operationComplete-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">operationComplete</span></h3>
 <p>操作完成。显示该操作已完成。当按照*OPC命令完成时设置此位.</p>
 <!-- @@@operationComplete -->
+<!-- $$$powerOn -->
+<h3 class="fn" translate="no" id="powerOn-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">powerOn</span></h3>
+<p>已通电。显示示波器已通电。完成后，诊断自检也会设置此位.</p>
+<!-- @@@powerOn -->
 <!-- $$$queryError -->
 <h3 class="fn" translate="no" id="queryError-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">queryError</span></h3>
 <p>查询错误。在没有数据存在或挂起的数据时，要么尝试读取输出队列，或者输出队列中的数据丢失.</p>
@@ -99,7 +104,7 @@
 <!-- @@@requestControl -->
 <!-- $$$userRequest -->
 <h3 class="fn" translate="no" id="userRequest-var"><span class="type">uint8_t</span> StandardEventStatusRegister::<span class="name">userRequest</span></h3>
-<p>已通电。显示示波器已通电。完成后，诊断自检也会设置此位.</p>
+<p>用户请求。表示已发生了一个应用程序事件.</p>
 <!-- @@@userRequest -->
 </div>
         </div>

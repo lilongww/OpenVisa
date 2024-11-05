@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 <!-- Attribute.cpp -->
   <meta name="description" content="驱动属性集.">
-  <title>Attribute Class | OpenVisa 0.13.0</title>
+  <title>Attribute Class | OpenVisa 0.15.0</title>
   <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
   <script type="text/javascript">
     document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
@@ -26,10 +26,10 @@
     <div class="main-rounded">
         <div class="navigationbar">
         <ul>
-<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
+<li><a href="index.html">OpenVisa 0.15.0</a></li>
 <li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
 <li>Attribute</li>
-<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
+<li id="buildversion">OpenVisa 0.15.0 Reference Documentation</li>
     </ul>
     </div>
 </div>
@@ -57,12 +57,12 @@
 <h2 id="public-functions">Public Functions</h2>
 <div class="table"><table class="alignedsummary" translate="no">
 <tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#autoAppendTerminalChars" translate="no">autoAppendTerminalChars</a></b>() const</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> std::optional&lt;unsigned int&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#baudRate" translate="no">baudRate</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#baudRate" translate="no">baudRate</a></b>() const</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#commandVerify" translate="no">commandVerify</a></b>() const</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> std::optional&lt;DataBits&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#dataBits" translate="no">dataBits</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> OpenVisa::DataBits </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#dataBits" translate="no">dataBits</a></b>() const</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> const std::string &amp;</td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#deviceName" translate="no">deviceName</a></b>() const</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> std::optional&lt;FlowControl&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#flowControl" translate="no">flowControl</a></b>() const</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> std::optional&lt;Parity&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#parity" translate="no">parity</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> OpenVisa::FlowControl </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#flowControl" translate="no">flowControl</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> OpenVisa::Parity </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#parity" translate="no">parity</a></b>() const</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#setAutoAppendTerminalChars" translate="no">setAutoAppendTerminalChars</a></b>(bool <i>en</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#setBaudRate" translate="no">setBaudRate</a></b>(unsigned int <i>baud</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#setCommandVerify" translate="no">setCommandVerify</a></b>(bool <i>enable</i>)</td></tr>
@@ -74,14 +74,14 @@
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#setTerminalChars" translate="no">setTerminalChars</a></b>(std::string_view <i>chars</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#setTerminalCharsEnable" translate="no">setTerminalCharsEnable</a></b>(bool <i>enable</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#setTimeout" translate="no">setTimeout</a></b>(const std::chrono::milliseconds &amp;<i>timeout</i>)</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> std::optional&lt;StopBits&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#stopBits" translate="no">stopBits</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> OpenVisa::StopBits </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#stopBits" translate="no">stopBits</a></b>() const</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> const std::string &amp;</td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#terminalChars" translate="no">terminalChars</a></b>() const</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#terminalCharsEnable" translate="no">terminalCharsEnable</a></b>() const</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> const std::chrono::milliseconds &amp;</td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#timeout" translate="no">timeout</a></b>() const</td></tr>
 </table></div>
 <h2 id="protected-functions">Protected Functions</h2>
 <div class="table"><table class="alignedsummary" translate="no">
-<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#Attribute" translate="no">Attribute</a></b>(std::shared_ptr&lt;IOBase&gt; *<i>io</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#Attribute" translate="no">Attribute</a></b>(std::shared_ptr&lt;OpenVisa::IOBase&gt; *<i>io</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="openvisa-object-attribute.html#dtor.Attribute" translate="no">~Attribute</a></b>()</td></tr>
 </table></div>
 <!-- $$$Attribute-description -->
@@ -91,12 +91,12 @@
 <!-- @@@Attribute -->
 <div class="func">
 <h2>Member Function Documentation</h2>
-<!-- $$$Attribute[overload1]$$$Attributestd::shared_ptr<IOBase>* -->
-<h3 class="fn" translate="no" id="Attribute"><code translate="no">[protected] </code>Attribute::<span class="name">Attribute</span>(<span class="type">std::shared_ptr</span>&lt;<span class="type">IOBase</span>&gt; *<i>io</i>)</h3>
+<!-- $$$Attribute[overload1]$$$Attributestd::shared_ptr<OpenVisa::IOBase>* -->
+<h3 class="fn" translate="no" id="Attribute"><code class="details extra" translate="no">[protected]</code> Attribute::<span class="name">Attribute</span>(<span class="type">std::shared_ptr</span>&lt;<span class="type">OpenVisa::IOBase</span>&gt; *<i>io</i>)</h3>
 <p>构造函数 <i translate="no">io</i>.</p>
 <!-- @@@Attribute -->
 <!-- $$$~Attribute[overload1]$$$~Attribute -->
-<h3 class="fn" translate="no" id="dtor.Attribute"><code translate="no">[noexcept protected] </code>Attribute::<span class="name">~Attribute</span>()</h3>
+<h3 class="fn" translate="no" id="dtor.Attribute"><code class="details extra" translate="no">[noexcept protected]</code> Attribute::<span class="name">~Attribute</span>()</h3>
 <p>析构函数.</p>
 <!-- @@@~Attribute -->
 <!-- $$$autoAppendTerminalChars[overload1]$$$autoAppendTerminalChars -->
@@ -105,7 +105,7 @@
 <p><b>See also </b><a href="openvisa-object-attribute.html#setAutoAppendTerminalChars" translate="no">setAutoAppendTerminalChars</a>.</p>
 <!-- @@@autoAppendTerminalChars -->
 <!-- $$$baudRate[overload1]$$$baudRate -->
-<h3 class="fn" translate="no" id="baudRate"><span class="type">std::optional</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>&gt; Attribute::<span class="name">baudRate</span>() const</h3>
+<h3 class="fn" translate="no" id="baudRate"><span class="type">unsigned</span> <span class="type">int</span> Attribute::<span class="name">baudRate</span>() const</h3>
 <p>返回波特率, 仅串口连接时有效，如果没有设置则返回 std::nullopt.</p>
 <p><b>See also </b><a href="openvisa-object-attribute.html#setBaudRate" translate="no">setBaudRate</a>().</p>
 <!-- @@@baudRate -->
@@ -115,7 +115,7 @@
 <p><b>See also </b><a href="openvisa-object-attribute.html#setCommandVerify" translate="no">setCommandVerify</a>.</p>
 <!-- @@@commandVerify -->
 <!-- $$$dataBits[overload1]$$$dataBits -->
-<h3 class="fn" translate="no" id="dataBits"><span class="type">std::optional</span>&lt;<span class="type"><a href="openvisa.html#DataBits-enum" translate="no">DataBits</a></span>&gt; Attribute::<span class="name">dataBits</span>() const</h3>
+<h3 class="fn" translate="no" id="dataBits"><span class="type"><a href="openvisa.html#DataBits-enum" translate="no">OpenVisa::DataBits</a></span> Attribute::<span class="name">dataBits</span>() const</h3>
 <p>返回数据位, 仅串口连接时有效，如果没有设置则返回 std::nullopt.</p>
 <p><b>See also </b><a href="openvisa-object-attribute.html#setDataBits" translate="no">setDataBits</a>.</p>
 <!-- @@@dataBits -->
@@ -125,12 +125,12 @@
 <p><b>See also </b><a href="openvisa-object-attribute.html#setDeviceName" translate="no">setDeviceName</a>.</p>
 <!-- @@@deviceName -->
 <!-- $$$flowControl[overload1]$$$flowControl -->
-<h3 class="fn" translate="no" id="flowControl"><span class="type">std::optional</span>&lt;<span class="type"><a href="openvisa.html#FlowControl-enum" translate="no">FlowControl</a></span>&gt; Attribute::<span class="name">flowControl</span>() const</h3>
+<h3 class="fn" translate="no" id="flowControl"><span class="type"><a href="openvisa.html#FlowControl-enum" translate="no">OpenVisa::FlowControl</a></span> Attribute::<span class="name">flowControl</span>() const</h3>
 <p>返回流控制, 仅串口连接时有效，如果没有设置则返回 std::nullopt.</p>
 <p><b>See also </b><a href="openvisa-object-attribute.html#setFlowControl" translate="no">setFlowControl</a>.</p>
 <!-- @@@flowControl -->
 <!-- $$$parity[overload1]$$$parity -->
-<h3 class="fn" translate="no" id="parity"><span class="type">std::optional</span>&lt;<span class="type"><a href="openvisa.html#Parity-enum" translate="no">Parity</a></span>&gt; Attribute::<span class="name">parity</span>() const</h3>
+<h3 class="fn" translate="no" id="parity"><span class="type"><a href="openvisa.html#Parity-enum" translate="no">OpenVisa::Parity</a></span> Attribute::<span class="name">parity</span>() const</h3>
 <p>返回校验规则, 仅串口连接时有效，如果没有设置则返回 std::nullopt.</p>
 <p><b>See also </b><a href="openvisa-object-attribute.html#setParity" translate="no">setParity</a>.</p>
 <!-- @@@parity -->
@@ -190,7 +190,7 @@
 <p><b>See also </b><a href="openvisa-object-attribute.html#timeout" translate="no">timeout</a>.</p>
 <!-- @@@setTimeout -->
 <!-- $$$stopBits[overload1]$$$stopBits -->
-<h3 class="fn" translate="no" id="stopBits"><span class="type">std::optional</span>&lt;<span class="type"><a href="openvisa.html#StopBits-enum" translate="no">StopBits</a></span>&gt; Attribute::<span class="name">stopBits</span>() const</h3>
+<h3 class="fn" translate="no" id="stopBits"><span class="type"><a href="openvisa.html#StopBits-enum" translate="no">OpenVisa::StopBits</a></span> Attribute::<span class="name">stopBits</span>() const</h3>
 <p>返回停止位, 仅串口连接时有效，如果没有设置则返回 std::nullopt.</p>
 <p><b>See also </b><a href="openvisa-object-attribute.html#setStopBits" translate="no">setStopBits</a>.</p>
 <!-- @@@stopBits -->

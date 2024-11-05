@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 <!-- AsciiArray.qdoc -->
   <meta name="description" content="Visa返回Ascii文本类型数组时，使用该类进行解析.">
-  <title>AsciiArray Class | OpenVisa 0.13.0</title>
+  <title>AsciiArray Class | OpenVisa 0.15.0</title>
   <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
   <script type="text/javascript">
     document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
@@ -26,10 +26,10 @@
     <div class="main-rounded">
         <div class="navigationbar">
         <ul>
-<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
+<li><a href="index.html">OpenVisa 0.15.0</a></li>
 <li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
 <li>AsciiArray</li>
-<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
+<li id="buildversion">OpenVisa 0.15.0 Reference Documentation</li>
     </ul>
     </div>
 </div>
@@ -50,15 +50,15 @@
 <!-- $$$AsciiArray-brief -->
 <p>Visa返回Ascii文本类型数组时，使用该类进行解析. <a href="#details">More...</a></p>
 <!-- @@@AsciiArray -->
-<div class="table"><table class="alignedsummary" translate="no">
-<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">  <span class="preprocessor">#include &lt;AsciiArray.h&gt;</span></td></tr>
+<div class="table"><table class="alignedsummary requisites" translate="no">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign"> <code translate="no">#include &lt;AsciiArray.h&gt;</code></td></tr>
 </table></div>
 <ul>
 <li><a href="openvisa-asciiarray-members.html">List of all members, including inherited members</a></li>
 </ul>
 <h2 id="public-functions">Public Functions</h2>
 <div class="table"><table class="alignedsummary" translate="no">
-<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="openvisa-asciiarray.html#AsciiArray" translate="no">AsciiArray</a></b>(std::string &amp;&amp;<i>buffer</i>, std::size_t <i>offset</i> = 0)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="openvisa-asciiarray.html#AsciiArray" translate="no">AsciiArray</a></b>(std::string &amp;&amp;<i>buffer</i>, size_t <i>offset</i> = 0)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> std::vector&lt;T&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-asciiarray.html#operator-std-3a-3avector-ltT-gt" translate="no">operator std::vector&lt;T&gt;</a></b>() const &&</td></tr>
 </table></div>
 <!-- $$$AsciiArray-description -->
@@ -71,8 +71,8 @@
 <!-- @@@AsciiArray -->
 <div class="func">
 <h2>Member Function Documentation</h2>
-<!-- $$$AsciiArray[overload1]$$$AsciiArraystd::string&&std::size_t -->
-<h3 class="fn" translate="no" id="AsciiArray">AsciiArray::<span class="name">AsciiArray</span>(<span class="type">std::string</span> &amp;&amp;<i>buffer</i>, <span class="type">std::size_t</span> <i>offset</i> = 0)</h3>
+<!-- $$$AsciiArray[overload1]$$$AsciiArraystd::string&&size_t -->
+<h3 class="fn" translate="no" id="AsciiArray">AsciiArray::<span class="name">AsciiArray</span>(<span class="type">std::string</span> &amp;&amp;<i>buffer</i>, <span class="type">size_t</span> <i>offset</i> = 0)</h3>
 <p>从 <i translate="no">buffer</i> 构造文本数组解析器并接管 <i translate="no">buffer</i> 的生命周期，跳过前面 <i translate="no">offset</i> 个字符串进行解析.例如：</p>
 <pre class="cpp" translate="no">
  AsciiArray<span class="operator">&lt;</span><span class="type">int</span><span class="operator">&gt;</span>(readAll());

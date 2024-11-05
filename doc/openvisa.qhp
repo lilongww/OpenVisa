@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-    <namespace>com.openvisa.0.13.0</namespace>
+    <namespace>com.openvisa.0.15.0</namespace>
     <virtualFolder>openvisa</virtualFolder>
     <metaData name="version" value=""/>
     <customFilter name="OpenVisa">
@@ -110,7 +110,6 @@
             <keyword name="commandVerify" id="Attribute::commandVerify" ref="openvisa-object-attribute.html#commandVerify"/>
             <keyword name="commonCommand" id="Object::commonCommand" ref="openvisa-object.html#commonCommand"/>
             <keyword name="commonCommand" id="ObjectAdapter::commonCommand" ref="openvisa-objectadapter.html#commonCommand"/>
-            <keyword name="connect" id="Object::connect" ref="openvisa-object.html#connect"/>
             <keyword name="connected" id="Object::connected" ref="openvisa-object.html#connected"/>
             <keyword name="data" id="BinaryArray::data" ref="openvisa-binaryarray.html#data"/>
             <keyword name="dataBits" id="Attribute::dataBits" ref="openvisa-object-attribute.html#dataBits"/>
@@ -142,6 +141,7 @@
             <keyword name="opt" id="CommonCommand::opt" ref="openvisa-object-commoncommand.html#opt"/>
             <keyword name="parity" id="Attribute::parity" ref="openvisa-object-attribute.html#parity"/>
             <keyword name="portName" id="SerialPortInfo::portName" ref="openvisa-serialportinfo.html#portName"/>
+            <keyword name="powerOn" id="StandardEventStatusRegister::powerOn" ref="openvisa-standardeventstatusregister.html#powerOn-var"/>
             <keyword name="productId" id="SerialPortInfo::productId" ref="openvisa-serialportinfo.html#productId"/>
             <keyword name="query" id="Object::query" ref="openvisa-object.html#query"/>
             <keyword name="query" id="ObjectAdapter::query" ref="openvisa-objectadapter.html#query"/>
