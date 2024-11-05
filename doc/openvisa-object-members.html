@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 <!-- Object.cpp -->
   <meta name="description" content="仪器通讯基础库.">
-  <title>List of All Members for Object | OpenVisa 0.13.0</title>
+  <title>List of All Members for Object | OpenVisa 0.15.0</title>
   <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
   <script type="text/javascript">
     document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
@@ -26,10 +26,10 @@
     <div class="main-rounded">
         <div class="navigationbar">
         <ul>
-<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
+<li><a href="index.html">OpenVisa 0.15.0</a></li>
 <li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
 <li>Object</li>
-<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
+<li id="buildversion">OpenVisa 0.15.0 Reference Documentation</li>
     </ul>
     </div>
 </div>
@@ -48,18 +48,17 @@
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#attribute" translate="no">attribute</a></b></span>() : OpenVisa::Object::Attribute &amp;</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#close" translate="no">close</a></b></span>()</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#commonCommand" translate="no">commonCommand</a></b></span>() : OpenVisa::Object::CommonCommand &amp;</li>
-<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#connect" translate="no">connect</a></b></span>(const int &amp;, const std::chrono::milliseconds &amp;, const std::chrono::milliseconds &amp;)</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#connected" translate="no">connected</a></b></span>() const : bool</li>
-</ul></td><td class="topAlign"><ul>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#fromVisaAddressString" translate="no">fromVisaAddressString</a></b></span>(const std::string &amp;) : OpenVisa::AddressVariant</li>
-<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#listSerialPorts" translate="no">listSerialPorts</a></b></span>() : int</li>
-<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#listUSB" translate="no">listUSB</a></b></span>() : int</li>
+</ul></td><td class="topAlign"><ul>
+<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#listSerialPorts" translate="no">listSerialPorts</a></b></span>() : std::vector&lt;std::string&gt;</li>
+<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#listUSB" translate="no">listUSB</a></b></span>() : std::vector&lt;OpenVisa::Address&lt;AddressType::USB&gt;&gt;</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#query" translate="no">query</a></b></span>(const std::string &amp;, const Args &amp;...) : std::string</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#read" translate="no">read</a></b></span>(unsigned long) : std::tuple&lt;std::string, bool&gt;</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#readAll" translate="no">readAll</a></b></span>() : std::string</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#removeTermChars" translate="no">removeTermChars</a></b></span>(const std::string &amp;) const : std::string</li>
 <li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#send" translate="no">send</a></b></span>(const std::string &amp;, const Args &amp;...)</li>
-<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#toVisaAddressString" translate="no">toVisaAddressString</a></b></span>(const int &amp;) : std::string</li>
+<li class="fn" translate="no"><span class="name"><b><a href="openvisa-object.html#toVisaAddressString" translate="no">toVisaAddressString</a></b></span>(const T &amp;) : std::string</li>
 </ul>
 </td></tr>
 </table></div>

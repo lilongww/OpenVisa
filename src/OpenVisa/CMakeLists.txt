@@ -9,9 +9,9 @@ else()
     set(OPENVISA_OPT SHARED)
 endif()
 
-find_package(Boost COMPONENTS regex system REQUIRED)
+find_package(Boost CONFIG REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR}/lib/include ${Boost_INCLUDE_DIRS} ${LIBUSB_INCLUDEDIR})
+include_directories(${LIBUSB_INCLUDEDIR})
 
 file(GLOB HEADERS "*.h")
 file(GLOB PRIVATES "Private/*.h" "Private/*.cpp")
@@ -45,9 +45,9 @@ add_library(${TARGET_NAME} ${OPENVISA_OPT}
 
 if(NOT BUILD_OPENVISA_STATIC)
     if(WIN32)
-        target_link_libraries(${TARGET_NAME} PUBLIC Setupapi PRIVATE libusb)
+        target_link_libraries(${TARGET_NAME} PUBLIC Setupapi PRIVATE libusb Boost::boost)
     else()
-        target_link_libraries(${TARGET_NAME} PUBLIC Setupapi PRIVATE libusb)
+        target_link_libraries(${TARGET_NAME} PUBLIC Setupapi PRIVATE libusb Boost::boost)
     endif()
 endif()
 set_target_properties(${TARGET_NAME} PROPERTIES PUBLIC_HEADER "${HEADERS}")

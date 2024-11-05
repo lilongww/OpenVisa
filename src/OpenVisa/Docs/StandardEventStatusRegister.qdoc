@@ -42,6 +42,6 @@
 */
 
 /*!
-    \variable   OpenVisa::StandardEventStatusRegister::userRequest
+    \variable   OpenVisa::StandardEventStatusRegister::powerOn
     \brief      已通电。显示示波器已通电。完成后，诊断自检也会设置此位.
 */

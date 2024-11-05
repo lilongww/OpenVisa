@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 <!-- SerialPortInfo.qdoc -->
   <meta name="description" content="串口信息类.">
-  <title>SerialPortInfo Class | OpenVisa 0.13.0</title>
+  <title>SerialPortInfo Class | OpenVisa 0.15.0</title>
   <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
   <script type="text/javascript">
     document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
@@ -26,10 +26,10 @@
     <div class="main-rounded">
         <div class="navigationbar">
         <ul>
-<li><a href="index.html" translate="no">OpenVisa 0.13.0</a></li>
+<li><a href="index.html">OpenVisa 0.15.0</a></li>
 <li><a href="openvisa-module.html" translate="no">OpenVisa</a></li>
 <li>SerialPortInfo</li>
-<li id="buildversion">OpenVisa 0.13.0 Reference Documentation</li>
+<li id="buildversion">OpenVisa 0.15.0 Reference Documentation</li>
     </ul>
     </div>
 </div>
@@ -51,8 +51,8 @@
 <!-- $$$SerialPortInfo-brief -->
 <p>串口信息类. <a href="#details">More...</a></p>
 <!-- @@@SerialPortInfo -->
-<div class="table"><table class="alignedsummary" translate="no">
-<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">  <span class="preprocessor">#include &lt;SerialPortInfo.h&gt;</span></td></tr>
+<div class="table"><table class="alignedsummary requisites" translate="no">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign"> <code translate="no">#include &lt;SerialPortInfo.h&gt;</code></td></tr>
 </table></div>
 <ul>
 <li><a href="openvisa-serialportinfo-members.html">List of all members, including inherited members</a></li>
@@ -73,7 +73,7 @@
 </table></div>
 <h2 id="static-public-members">Static Public Members</h2>
 <div class="table"><table class="alignedsummary" translate="no">
-<tr><td class="memItemLeft rightAlign topAlign"> std::vector&lt;SerialPortInfo&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-serialportinfo.html#listPorts" translate="no">listPorts</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::vector&lt;OpenVisa::SerialPortInfo&gt; </td><td class="memItemRight bottomAlign"><b><a href="openvisa-serialportinfo.html#listPorts" translate="no">listPorts</a></b>()</td></tr>
 </table></div>
 <!-- $$$SerialPortInfo-description -->
 <div class="descr">
@@ -86,57 +86,57 @@
 <div class="func">
 <h2>Member Function Documentation</h2>
 <!-- $$$SerialPortInfo[overload1]$$$SerialPortInfo -->
-<h3 class="fn" translate="no" id="SerialPortInfo"><code translate="no">[noexcept] </code>SerialPortInfo::<span class="name">SerialPortInfo</span>()</h3>
+<h3 class="fn" translate="no" id="SerialPortInfo"><code class="details extra" translate="no">[noexcept]</code> SerialPortInfo::<span class="name">SerialPortInfo</span>()</h3>
 <p>构造函数.</p>
 <!-- @@@SerialPortInfo -->
 <!-- $$$~SerialPortInfo[overload1]$$$~SerialPortInfo -->
-<h3 class="fn" translate="no" id="dtor.SerialPortInfo"><code translate="no">[noexcept] </code>SerialPortInfo::<span class="name">~SerialPortInfo</span>()</h3>
+<h3 class="fn" translate="no" id="dtor.SerialPortInfo"><code class="details extra" translate="no">[noexcept]</code> SerialPortInfo::<span class="name">~SerialPortInfo</span>()</h3>
 <p>析构函数.</p>
 <!-- @@@~SerialPortInfo -->
 <!-- $$$description[overload1]$$$description -->
-<h3 class="fn" translate="no" id="description"><code translate="no">[noexcept] </code>const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">description</span>() const</h3>
+<h3 class="fn" translate="no" id="description"><code class="details extra" translate="no">[noexcept]</code> const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">description</span>() const</h3>
 <p>返回串口描述信息.</p>
 <!-- @@@description -->
 <!-- $$$hardwareID[overload1]$$$hardwareID -->
-<h3 class="fn" translate="no" id="hardwareID"><code translate="no">[noexcept] </code>const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">hardwareID</span>() const</h3>
+<h3 class="fn" translate="no" id="hardwareID"><code class="details extra" translate="no">[noexcept]</code> const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">hardwareID</span>() const</h3>
 <p>返回串口硬件ID.</p>
 <!-- @@@hardwareID -->
 <!-- $$$hasProductId[overload1]$$$hasProductId -->
-<h3 class="fn" translate="no" id="hasProductId"><code translate="no">[noexcept] </code><span class="type">bool</span> SerialPortInfo::<span class="name">hasProductId</span>() const</h3>
+<h3 class="fn" translate="no" id="hasProductId"><code class="details extra" translate="no">[noexcept]</code> <span class="type">bool</span> SerialPortInfo::<span class="name">hasProductId</span>() const</h3>
 <p>返回串口是否有 product id.</p>
 <!-- @@@hasProductId -->
 <!-- $$$hasVendorId[overload1]$$$hasVendorId -->
-<h3 class="fn" translate="no" id="hasVendorId"><code translate="no">[noexcept] </code><span class="type">bool</span> SerialPortInfo::<span class="name">hasVendorId</span>() const</h3>
+<h3 class="fn" translate="no" id="hasVendorId"><code class="details extra" translate="no">[noexcept]</code> <span class="type">bool</span> SerialPortInfo::<span class="name">hasVendorId</span>() const</h3>
 <p>返回串口是否有 vendor id.</p>
 <!-- @@@hasVendorId -->
 <!-- $$$listPorts[overload1]$$$listPorts -->
-<h3 class="fn" translate="no" id="listPorts"><code translate="no">[static] </code><span class="type">std::vector</span>&lt;<span class="type"><a href="openvisa-serialportinfo.html#SerialPortInfo" translate="no">SerialPortInfo</a></span>&gt; SerialPortInfo::<span class="name">listPorts</span>()</h3>
+<h3 class="fn" translate="no" id="listPorts"><code class="details extra" translate="no">[static]</code> <span class="type">std::vector</span>&lt;<span class="type"><a href="openvisa-serialportinfo.html" translate="no">OpenVisa::SerialPortInfo</a></span>&gt; SerialPortInfo::<span class="name">listPorts</span>()</h3>
 <p>返回计算机上存在的串口列表.</p>
 <div class="admonition note">
 <p><b>Note: </b>仅windows有效.</p>
 </div>
 <!-- @@@listPorts -->
 <!-- $$$manufacturer[overload1]$$$manufacturer -->
-<h3 class="fn" translate="no" id="manufacturer"><code translate="no">[noexcept] </code>const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">manufacturer</span>() const</h3>
+<h3 class="fn" translate="no" id="manufacturer"><code class="details extra" translate="no">[noexcept]</code> const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">manufacturer</span>() const</h3>
 <p>返回串口生产商.</p>
 <!-- @@@manufacturer -->
 <!-- $$$portName[overload1]$$$portName -->
-<h3 class="fn" translate="no" id="portName"><code translate="no">[noexcept] </code>const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">portName</span>() const</h3>
+<h3 class="fn" translate="no" id="portName"><code class="details extra" translate="no">[noexcept]</code> const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">portName</span>() const</h3>
 <p>返回串口名称.</p>
 <!-- @@@portName -->
 <!-- $$$productId[overload1]$$$productId -->
-<h3 class="fn" translate="no" id="productId"><code translate="no">[noexcept] </code><span class="type">unsigned</span> <span class="type">short</span> SerialPortInfo::<span class="name">productId</span>() const</h3>
+<h3 class="fn" translate="no" id="productId"><code class="details extra" translate="no">[noexcept]</code> <span class="type">unsigned</span> <span class="type">short</span> SerialPortInfo::<span class="name">productId</span>() const</h3>
 <p>返回串口的 product id.</p>
 <!-- @@@productId -->
 <!-- $$$serialNumber[overload1]$$$serialNumber -->
-<h3 class="fn" translate="no" id="serialNumber"><code translate="no">[noexcept] </code>const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">serialNumber</span>() const</h3>
+<h3 class="fn" translate="no" id="serialNumber"><code class="details extra" translate="no">[noexcept]</code> const <span class="type">std::string</span> &amp;SerialPortInfo::<span class="name">serialNumber</span>() const</h3>
 <p>返回串口的序列号.</p>
 <div class="admonition note">
 <p><b>Note: </b>一般只在 vid 或者 pid 存在的情况下才有序列号.</p>
 </div>
 <!-- @@@serialNumber -->
 <!-- $$$vendorId[overload1]$$$vendorId -->
-<h3 class="fn" translate="no" id="vendorId"><code translate="no">[noexcept] </code><span class="type">unsigned</span> <span class="type">short</span> SerialPortInfo::<span class="name">vendorId</span>() const</h3>
+<h3 class="fn" translate="no" id="vendorId"><code class="details extra" translate="no">[noexcept]</code> <span class="type">unsigned</span> <span class="type">short</span> SerialPortInfo::<span class="name">vendorId</span>() const</h3>
 <p>返回串口的 vendor id.</p>
 <!-- @@@vendorId -->
 </div>
