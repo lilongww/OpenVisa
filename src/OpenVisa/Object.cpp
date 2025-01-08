@@ -20,6 +20,7 @@
 #include "Attribute.h"
 #include "CommonCommand.h"
 #include "Private/HiSLIP.h"
+#include "Private/IOTrace.h"
 #include "Private/IviUsbTmc.h"
 #include "Private/RawSocket.h"
 #include "Private/SerialPort.h"
@@ -46,7 +47,17 @@ struct Object::Impl
     Attribute attr;
     CommonCommand commonCommand;
     bool verified { false };
+    std::string address;
     inline Impl(Object& obj) : commonCommand(obj), attr(&io) {}
+    std::shared_ptr<IOTrace> getOrCreateIOTrace()
+    {
+        if (!ioTrace)
+            ioTrace = std::make_shared<IOTrace>(attr);
+        return ioTrace;
+    }
+
+private:
+    std::shared_ptr<IOTrace> ioTrace;
 };
 
 /*!
@@ -81,6 +92,49 @@ struct Object::Impl
     \sa         fromVisaAddressString
 */
 
+template<>
+OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::VXI11>>(const Address<AddressType::VXI11>& addr)
+{
+    return std::format("TCPIP::{}::{}::INSTR", addr.ip(), addr.subAddress());
+}
+
+template<>
+OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::RawSocket>>(const Address<AddressType::RawSocket>& addr)
+{
+    return std::format("TCPIP::{}::{}::SOCKET", addr.ip(), addr.port());
+}
+
+template<>
+OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::HiSLIP>>(const Address<AddressType::HiSLIP>& addr)
+{
+    return std::format("TCPIP::{}::{}", addr.ip(), addr.subAddress());
+}
+
+template<>
+OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::SerialPort>>(const Address<AddressType::SerialPort>& addr)
+{
+    if (!addr.portName().starts_with("COM") && !addr.portName().starts_with("com"))
+        return {};
+
+    std::string temp;
+    std::ranges::copy(addr.portName() | std::views::filter([](auto ch) { return ch >= '0' && ch <= '9'; }), std::back_inserter(temp));
+    try
+    {
+        auto port = std::stoul(temp);
+        return std::format("ASRL{}::INSTR", port);
+    }
+    catch (...)
+    {
+        return {};
+    }
+}
+
+template<>
+OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::USB>>(const Address<AddressType::USB>& addr)
+{
+    return std::format("USB::{:#04X}::{:#04X}::{}::INSTR", addr.vendorId(), addr.productId(), addr.serialNumber());
+}
+
 /*!
     \brief      构造函数.
 */
@@ -113,6 +167,7 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::RawSocket>>(const 
     visaReThrow(m_impl->attr, [&] { socket->connect(addr, openTimeout); });
     m_impl->io = socket;
     afterConnected();
+    m_impl->address = Object::toVisaAddressString(addr);
 }
 
 template<>
@@ -125,6 +180,7 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::SerialPort>>(const
     visaReThrow(m_impl->attr, [&] { serialPort->connect(addr, openTimeout); });
     m_impl->io = serialPort;
     afterConnected();
+    m_impl->address = Object::toVisaAddressString(addr);
 }
 
 template<>
@@ -146,6 +202,7 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::USB>>(const Addres
         m_impl->io = usb;
     }
     afterConnected();
+    m_impl->address = Object::toVisaAddressString(addr);
 }
 
 template<>
@@ -158,6 +215,7 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::VXI11>>(const Addr
     visaReThrow(m_impl->attr, [&] { vxi11->connect(addr, openTimeout); });
     m_impl->io = vxi11;
     afterConnected();
+    m_impl->address = Object::toVisaAddressString<Address<AddressType::VXI11>>(addr);
 }
 
 template<>
@@ -170,6 +228,7 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::HiSLIP>>(const Add
     visaReThrow(m_impl->attr, [&] { hiSLIP->connect(addr, openTimeout); });
     m_impl->io = hiSLIP;
     afterConnected();
+    m_impl->address = Object::toVisaAddressString(addr);
 }
 
 template<>
@@ -191,27 +250,30 @@ OPENVISA_EXPORT void Object::connectImpl<std::string>(const std::string& addr,
 */
 std::string Object::readAll()
 {
-    return visaReThrow(m_impl->attr,
-                       [&]
-                       {
-                           throwNoConnection();
-                           try
+    auto ret = visaReThrow(m_impl->attr,
+                           [&]
                            {
-                               return m_impl->io->readAll();
-                           }
-                           catch (...)
-                           {
-                               if (m_impl->attr.commandVerify())
+                               throwNoConnection();
+                               try
                                {
-                                   m_impl->io->reset();
-                                   auto error       = verifyCommand();
-                                   m_impl->verified = false;
-                                   if (!error.empty())
-                                       throw std::runtime_error(error);
+                                   return m_impl->io->readAll();
                                }
-                               throw;
-                           }
-                       });
+                               catch (...)
+                               {
+                                   if (m_impl->attr.commandVerify())
+                                   {
+                                       m_impl->io->reset();
+                                       auto error       = verifyCommand();
+                                       m_impl->verified = false;
+                                       if (!error.empty())
+                                           throw std::runtime_error(error);
+                                   }
+                                   throw;
+                               }
+                           });
+    if (m_impl->attr.ioTraceEnable())
+        m_impl->getOrCreateIOTrace()->tx(m_impl->address, ret);
+    return ret;
 }
 
 /*!
@@ -220,12 +282,15 @@ std::string Object::readAll()
 */
 std::tuple<std::string, bool> Object::read(unsigned long blockSize)
 {
-    return visaReThrow(m_impl->attr,
-                       [&]() -> std::tuple<std::string, bool>
-                       {
-                           throwNoConnection();
-                           return { m_impl->io->read(blockSize), m_impl->io->avalible() };
-                       });
+    auto ret = visaReThrow(m_impl->attr,
+                           [&]() -> std::tuple<std::string, bool>
+                           {
+                               throwNoConnection();
+                               return { m_impl->io->read(blockSize), m_impl->io->avalible() };
+                           });
+    if (m_impl->attr.ioTraceEnable())
+        m_impl->getOrCreateIOTrace()->rx(m_impl->address, std::get<0>(ret));
+    return ret;
 }
 
 /*!
@@ -337,6 +402,8 @@ void Object::sendImpl(const std::string& scpi)
         m_impl->io->send(scpi + m_impl->attr.terminalChars());
     else
         m_impl->io->send(scpi);
+    if (m_impl->attr.ioTraceEnable())
+        m_impl->getOrCreateIOTrace()->tx(m_impl->address, scpi);
     if (m_impl->attr.commandVerify() && !scpi.contains("?")) // 非查询指令直接进行指令验证
     {
         auto error       = verifyCommand();
@@ -372,50 +439,6 @@ std::string Object::verifyCommand()
     else if (esr.queryError)
         return "Query error.";
     return {};
-}
-
-template<>
-OPENVISA_EXPORT static std::string Object::toVisaAddressString<Address<AddressType::VXI11>>(const Address<AddressType::VXI11>& addr)
-{
-    return std::format("TCPIP::{}::{}::INSTR", addr.ip(), addr.subAddress());
-}
-
-template<>
-OPENVISA_EXPORT static std::string Object::toVisaAddressString<Address<AddressType::RawSocket>>(const Address<AddressType::RawSocket>& addr)
-{
-    return std::format("TCPIP::{}::{}::SOCKET", addr.ip(), addr.port());
-}
-
-template<>
-OPENVISA_EXPORT static std::string Object::toVisaAddressString<Address<AddressType::HiSLIP>>(const Address<AddressType::HiSLIP>& addr)
-{
-    return std::format("TCPIP::{}::{}", addr.ip(), addr.subAddress());
-}
-
-template<>
-OPENVISA_EXPORT static std::string Object::toVisaAddressString<Address<AddressType::SerialPort>>(
-    const Address<AddressType::SerialPort>& addr)
-{
-    if (!addr.portName().starts_with("COM") && !addr.portName().starts_with("com"))
-        return {};
-
-    std::string temp;
-    std::ranges::copy(addr.portName() | std::views::filter([](auto ch) { return ch >= '0' && ch <= '9'; }), std::back_inserter(temp));
-    try
-    {
-        auto port = std::stoul(temp);
-        return std::format("ASRL{}::INSTR", port);
-    }
-    catch (...)
-    {
-        return {};
-    }
-}
-
-template<>
-OPENVISA_EXPORT static std::string Object::toVisaAddressString<Address<AddressType::USB>>(const Address<AddressType::USB>& addr)
-{
-    return std::format("USB::{:#04X}::{:#04X}::{}::INSTR", addr.vendorId(), addr.productId(), addr.serialNumber());
 }
 
 } // namespace OpenVisa

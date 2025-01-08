@@ -35,6 +35,8 @@ struct Object::Attribute::Impl
     StopBits stopBits { StopBits::One };
     std::string deviceName;
     bool commandVerify { false };
+    bool ioTraceEnable { true };
+    unsigned short tracePort { 39167 };
     inline Impl(std::shared_ptr<IOBase>* _io) : io(_io) {}
     inline std::shared_ptr<SerialPort> asSerialPort() const { return io ? std::dynamic_pointer_cast<SerialPort>(*io) : nullptr; }
 };
@@ -260,5 +262,29 @@ void Object::Attribute::setCommandVerify(bool enable) { m_impl->commandVerify = 
     \sa         setCommandVerify
 */
 bool Object::Attribute::commandVerify() const { return m_impl->commandVerify; }
+
+/*!
+    \brief      设置 IO Trace 的端口号 \a port, 默认39167.
+    \sa         tracePort
+*/
+void Object::Attribute::setIOTracePort(unsigned short port) { m_impl->tracePort = port; }
+
+/*!
+    \brief      返回 IO Trace 的端口号.
+    \sa         setTracePort
+*/
+unsigned short Object::Attribute::ioTracePort() const { return m_impl->tracePort; }
+
+/*!
+    \brief      设置是否启用 IO Trace 功能, \a en.
+    \sa         ioTraceEnable
+*/
+void Object::Attribute::setIOTraceEnable(bool en) { m_impl->ioTraceEnable = en; }
+
+/*!
+    \brief      返回是否启用 IO Trace.
+    \sa         setIOTraceEnable
+*/
+bool Object::Attribute::ioTraceEnable() const { return m_impl->ioTraceEnable; }
 
 } // namespace OpenVisa

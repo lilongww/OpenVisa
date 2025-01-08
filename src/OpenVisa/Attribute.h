@@ -92,6 +92,10 @@ public:
     [[nodiscard]] const std::string& deviceName() const;
     void setCommandVerify(bool enable);
     [[nodiscard]] bool commandVerify() const;
+    void setIOTraceEnable(bool en);
+    [[nodiscard]] bool ioTraceEnable() const;
+    void setIOTracePort(unsigned short port);
+    [[nodiscard]] unsigned short ioTracePort() const;
 
 protected:
     Attribute(std::shared_ptr<IOBase>* io);
