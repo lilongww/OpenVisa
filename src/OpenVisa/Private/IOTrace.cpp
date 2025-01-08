@@ -36,9 +36,9 @@ struct TraceData
     inline operator std::string() const
     {
         std::string buf;
-        buf.push_back(tx);
         serialize(buf, TraceHeader);
         serialize(buf, version);
+        buf.push_back(tx);
         serialize(buf, address);
         serialize(buf, data);
         return buf;
@@ -55,7 +55,7 @@ private:
     inline void serialize(std::string& buf, T value) const
     {
         auto begin = reinterpret_cast<const char*>(&value);
-        buf.append(buf.append_range(std::string_view(begin, begin + sizeof(T))));
+        buf.append_range(std::string_view(begin, sizeof(T)));
     }
 };
 
