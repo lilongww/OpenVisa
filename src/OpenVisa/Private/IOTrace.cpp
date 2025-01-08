@@ -26,6 +26,8 @@
 
 namespace OpenVisa
 {
+constexpr unsigned short TraceHeader = 0xCFCF;
+constexpr unsigned int TraceVersion  = 1;
 struct TraceData
 {
     const bool& tx;
@@ -35,6 +37,8 @@ struct TraceData
     {
         std::string buf;
         buf.push_back(tx);
+        serialize(buf, TraceHeader);
+        serialize(buf, TraceVersion);
         serialize(buf, address);
         serialize(buf, data);
         return buf;
@@ -43,10 +47,15 @@ struct TraceData
 private:
     inline void serialize(std::string& buf, const std::string& str) const
     {
-        auto size  = str.size();
-        auto begin = reinterpret_cast<const char*>(&size);
-        buf.append_range(std::string_view(begin, begin + sizeof(size)));
+        serialize(buf, str.size());
         buf.append(str);
+    }
+    template<typename T>
+    requires std::is_integral_v<T>
+    inline void serialize(std::string& buf, T value) const
+    {
+        auto begin = reinterpret_cast<const char*>(&value);
+        buf.append(buf.append_range(std::string_view(begin, begin + sizeof(T))));
     }
 };
 

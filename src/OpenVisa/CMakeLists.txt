@@ -1,6 +1,6 @@
 ﻿set(TARGET_NAME OpenVisa)
 
-add_compile_definitions(OPENVISA_LIB)
+add_compile_definitions(OPENVISA_LIB _WIN32_WINNT=0x601)
 link_directories(${LIBUSB_LIBRARY})
 if(BUILD_OPENVISA_STATIC)
     add_compile_definitions(BUILD_OPENVISA_STATIC)
