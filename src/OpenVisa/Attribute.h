@@ -96,6 +96,7 @@ public:
     [[nodiscard]] bool ioTraceEnable() const;
     void setIOTracePort(unsigned short port);
     [[nodiscard]] unsigned short ioTracePort() const;
+    [[nodiscard]] unsigned short ioTraceVersion() const;
 
 protected:
     Attribute(std::shared_ptr<IOBase>* io);

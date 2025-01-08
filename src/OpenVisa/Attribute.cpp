@@ -287,4 +287,9 @@ void Object::Attribute::setIOTraceEnable(bool en) { m_impl->ioTraceEnable = en; 
 */
 bool Object::Attribute::ioTraceEnable() const { return m_impl->ioTraceEnable; }
 
+/*!
+    \brief      返回 IO Trace 的协议版本.
+*/
+unsigned short Object::Attribute::ioTraceVersion() const { return 1; }
+
 } // namespace OpenVisa

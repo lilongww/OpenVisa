@@ -27,9 +27,9 @@
 namespace OpenVisa
 {
 constexpr unsigned short TraceHeader = 0xCFCF;
-constexpr unsigned int TraceVersion  = 1;
 struct TraceData
 {
+    const unsigned short version;
     const bool& tx;
     const std::string& address;
     const std::string& data;
@@ -38,7 +38,7 @@ struct TraceData
         std::string buf;
         buf.push_back(tx);
         serialize(buf, TraceHeader);
-        serialize(buf, TraceVersion);
+        serialize(buf, version);
         serialize(buf, address);
         serialize(buf, data);
         return buf;
@@ -75,7 +75,7 @@ void IOTrace::rx(const std::string& address, const std::string& data) { trace(fa
 
 void IOTrace::trace(bool tx, const std::string& address, const std::string& data)
 {
-    m_impl->socket.send_to(boost::asio::buffer(static_cast<std::string>(TraceData { tx, address, data })),
+    m_impl->socket.send_to(boost::asio::buffer(static_cast<std::string>(TraceData { m_attr.ioTraceVersion(), tx, address, data })),
                            boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), m_attr.ioTracePort()));
 }
 
