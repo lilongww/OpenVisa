@@ -21,6 +21,7 @@
 
 #include <boost/asio.hpp>
 
+#include <chrono>
 #include <algorithm>
 #include <ranges>
 
@@ -38,6 +39,8 @@ struct TraceData
         std::string buf;
         serialize(buf, TraceHeader);
         serialize(buf, version);
+        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        serialize(buf, time.count());
         buf.push_back(tx);
         serialize(buf, address);
         serialize(buf, data);
