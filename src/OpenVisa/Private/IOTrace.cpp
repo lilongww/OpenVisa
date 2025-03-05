@@ -28,12 +28,15 @@
 namespace OpenVisa
 {
 constexpr unsigned short TraceHeader = 0xCFCF;
+constexpr auto PackSize              = 60'000;
 struct TraceData
 {
     const unsigned short version;
-    const bool& tx;
-    const std::string& address;
-    const std::string& data;
+    const bool tx;
+    const int currentPackNumber;
+    const int totalPackNumber;
+    std::string_view address;
+    std::string_view data;
     inline operator std::string() const
     {
         std::string buf;
@@ -42,18 +45,15 @@ struct TraceData
         auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
         serialize(buf, time.count());
         buf.push_back(tx);
+        serialize(buf, currentPackNumber);
+        serialize(buf, totalPackNumber);
         serialize(buf, address);
-        if (data.size() > 1024)
-        {
-            serialize(buf, std::string(data.begin(), data.begin() + 1024));
-        }
-        else
-            serialize(buf, data);
+        serialize(buf, data);
         return buf;
     }
 
 private:
-    inline void serialize(std::string& buf, const std::string& str) const
+    inline void serialize(std::string& buf, std::string_view str) const
     {
         serialize(buf, str.size());
         buf.append(str);
@@ -83,8 +83,13 @@ void IOTrace::rx(const std::string& address, const std::string& data) { trace(fa
 
 void IOTrace::trace(bool tx, const std::string& address, const std::string& data)
 {
-    m_impl->socket.send_to(boost::asio::buffer(static_cast<std::string>(TraceData { m_attr.ioTraceVersion(), tx, address, data })),
-                           boost::asio::ip::udp::endpoint(boost::asio::ip::make_address_v4("127.0.0.1"), m_attr.ioTracePort()));
+    int packCount = static_cast<int>(data.size() / PackSize + (data.size() % PackSize ? 1 : 0));
+    for (int i = 0; auto view : data | std::views::chunk(PackSize))
+    {
+        m_impl->socket.send_to(boost::asio::buffer(static_cast<std::string>(TraceData {
+                                   m_attr.ioTraceVersion(), tx, i++, packCount, address, std::string_view(view.begin(), view.end()) })),
+                               boost::asio::ip::udp::endpoint(boost::asio::ip::make_address_v4("127.0.0.1"), m_attr.ioTracePort()));
+    }
 }
 
 } // namespace OpenVisa
