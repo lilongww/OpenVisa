@@ -21,8 +21,8 @@
 
 #include <boost/asio.hpp>
 
-#include <chrono>
 #include <algorithm>
+#include <chrono>
 #include <ranges>
 
 namespace OpenVisa
@@ -43,7 +43,12 @@ struct TraceData
         serialize(buf, time.count());
         buf.push_back(tx);
         serialize(buf, address);
-        serialize(buf, data);
+        if (data.size() > 1024)
+        {
+            serialize(buf, std::string(data.begin(), data.begin() + 1024));
+        }
+        else
+            serialize(buf, data);
         return buf;
     }
 
@@ -79,7 +84,7 @@ void IOTrace::rx(const std::string& address, const std::string& data) { trace(fa
 void IOTrace::trace(bool tx, const std::string& address, const std::string& data)
 {
     m_impl->socket.send_to(boost::asio::buffer(static_cast<std::string>(TraceData { m_attr.ioTraceVersion(), tx, address, data })),
-                           boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), m_attr.ioTracePort()));
+                           boost::asio::ip::udp::endpoint(boost::asio::ip::make_address_v4("127.0.0.1"), m_attr.ioTracePort()));
 }
 
 } // namespace OpenVisa
