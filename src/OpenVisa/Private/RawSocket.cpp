@@ -1,6 +1,6 @@
 ﻿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2024 LiLong                                              **
+**  Copyright (C) 2022-2025 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -29,7 +29,7 @@ struct RawSocket::Impl
 {
     boost::asio::io_context io;
     boost::asio::ip::tcp::socket socket { io };
-    boost::asio::io_context::work worker { io };
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker { boost::asio::make_work_guard(io) };
     std::jthread thread;
     std::string writeBuffer;
     boost::asio::streambuf readBuffer;
@@ -56,7 +56,7 @@ void RawSocket::connect(const Address<AddressType::RawSocket>& addr, const std::
     auto error = std::make_shared<boost::system::error_code>();
     auto mutex = std::make_shared<std::timed_mutex>();
     mutex->lock();
-    m_impl->socket.async_connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(addr.ip()), addr.port()),
+    m_impl->socket.async_connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::make_address(addr.ip()), addr.port()),
                                  [=](const boost::system::error_code& e)
                                  {
                                      *error = e;
@@ -199,7 +199,7 @@ std::string RawSocket::readAllAscii() const
         m_impl->socket.close();
         boost::asio::detail::throw_error(*error, "readAllAscii");
     }
-    std::string buffer(boost::asio::buffer_cast<const char*>(m_impl->readBuffer.data()), m_impl->readBuffer.size());
+    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
     return buffer;
 }
 
@@ -207,14 +207,16 @@ std::string RawSocket::readAllBlockData(unsigned char bufferStringLen) const
 {
     auto mutex = std::make_shared<std::timed_mutex>();
     mutex->lock();
-    auto error = std::make_shared<boost::system::error_code>();
-    auto size  = std::make_shared<std::size_t>(0);
-    m_impl->io.post(
+    auto error     = std::make_shared<boost::system::error_code>();
+    auto size      = std::make_shared<std::size_t>(0);
+    auto isTimeout = std::make_shared<std::atomic_bool>(false);
+    boost::asio::post(m_impl->io,
         [=]()
         {
             std::scoped_lock lock(std::adopt_lock, *mutex);
             std::string buffer(static_cast<size_t>(bufferStringLen), '0');
-            boost::asio::read(m_impl->socket, boost::asio::buffer(buffer), boost::asio::transfer_exactly(bufferStringLen), *error);
+            if (!*isTimeout)
+                boost::asio::read(m_impl->socket, boost::asio::buffer(buffer), boost::asio::transfer_exactly(bufferStringLen), *error);
             if (*error)
             {
                 return;
@@ -234,6 +236,8 @@ std::string RawSocket::readAllBlockData(unsigned char bufferStringLen) const
                 // str不是一个数字，即非visa二进制传输格式.
                 while (m_impl->socket.available())
                 {
+                    if (*isTimeout)
+                        return;
                     boost::asio::read(m_impl->socket, m_impl->readBuffer, *error);
                     if (*error)
                     {
@@ -241,11 +245,13 @@ std::string RawSocket::readAllBlockData(unsigned char bufferStringLen) const
                     }
                 }
             }
-            boost::asio::read(m_impl->socket, m_impl->readBuffer, boost::asio::transfer_at_least(len), *error);
+            if (!*isTimeout)
+                boost::asio::read(m_impl->socket, m_impl->readBuffer, boost::asio::transfer_at_least(len), *error);
         });
 
     if (!mutex->try_lock_for(m_attr.timeout()))
     {
+        *isTimeout = true;
         m_impl->socket.cancel();
         throw std::exception("Read timeout.");
     }
@@ -254,7 +260,7 @@ std::string RawSocket::readAllBlockData(unsigned char bufferStringLen) const
         m_impl->socket.close();
         boost::asio::detail::throw_error(*error, "readAllBlockData");
     }
-    std::string buffer(boost::asio::buffer_cast<const char*>(m_impl->readBuffer.data()), m_impl->readBuffer.size());
+    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
     return buffer;
 }
 } // namespace OpenVisa

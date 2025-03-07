@@ -16,15 +16,26 @@
 **  You should have received a copy of the GNU Lesser General Public License    **
 **  along with OpenVisa.  If not, see <https://www.gnu.org/licenses/>.          **
 **********************************************************************************/
-
 #pragma once
 
-#define OPENVISA_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
-#define OPENVISA_VERSION_MINOR ${PROJECT_VERSION_MINOR}
-#define OPENVISA_VERSION_MICRO ${PROJECT_VERSION_PATCH}
+#include "../Attribute.h"
 
-#define _OPENVISA_TOSTR(x) #x
-#define _OPENVISA_TO_STR(x) _OPENVISA_TOSTR(x)
+namespace OpenVisa
+{
+class IOTrace
+{
+public:
+    IOTrace(Object::Attribute const& attr);
+    ~IOTrace();
+    void tx(const std::string& address, const std::string& data);
+    void rx(const std::string& address, const std::string& data);
 
-#define OPENVISA_VERSION                                                                                                                   \
-    _OPENVISA_TO_STR(OPENVISA_VERSION_MAJOR) "." _OPENVISA_TO_STR(OPENVISA_VERSION_MINOR) "." _OPENVISA_TO_STR(OPENVISA_VERSION_MICRO)
+private:
+    void trace(bool tx, const std::string& address, const std::string& data);
+
+private:
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+    Object::Attribute const& m_attr;
+};
+} // namespace OpenVisa

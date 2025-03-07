@@ -1,6 +1,6 @@
 ﻿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2024 LiLong                                              **
+**  Copyright (C) 2022-2025 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -31,7 +31,7 @@ struct SerialPort::Impl
 {
     boost::asio::io_context io;
     boost::asio::serial_port serialPort { io };
-    boost::asio::io_context::work worker { io };
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker { boost::asio::make_work_guard(io) };
     std::jthread thread;
     std::string writeBuffer;
     boost::asio::streambuf readBuffer;
@@ -231,7 +231,7 @@ std::string SerialPort::readAllAscii() const
         m_impl->serialPort.close();
         boost::asio::detail::throw_error(*error, "readAllAscii");
     }
-    std::string buffer(boost::asio::buffer_cast<const char*>(m_impl->readBuffer.data()), m_impl->readBuffer.size());
+    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
     return buffer;
 }
 
@@ -241,40 +241,41 @@ std::string SerialPort::readAllBlockData(unsigned char bufferStringLen) const
     mutex->lock();
     auto error = std::make_shared<boost::system::error_code>();
     auto size  = std::make_shared<std::size_t>(0);
-    m_impl->io.post(
-        [=]()
-        {
-            std::scoped_lock lock(std::adopt_lock, *mutex);
-            std::string buffer(static_cast<size_t>(bufferStringLen), '0');
-            boost::asio::read(m_impl->serialPort, boost::asio::buffer(buffer), boost::asio::transfer_exactly(bufferStringLen), *error);
-            if (*error)
-            {
-                return;
-            }
-            else
-            {
-                std::ostream os(&m_impl->readBuffer);
-                os.write(buffer.c_str(), buffer.size());
-            }
-            size_t len;
-            try
-            {
-                len = std::stoull(buffer);
-            }
-            catch (const std::exception&)
-            {
-                // str不是一个数字，即非visa二进制传输格式.
-                while (avalible())
-                {
-                    boost::asio::read(m_impl->serialPort, m_impl->readBuffer, *error);
-                    if (*error)
-                    {
-                        return;
-                    }
-                }
-            }
-            boost::asio::read(m_impl->serialPort, m_impl->readBuffer, boost::asio::transfer_at_least(len), *error);
-        });
+    boost::asio::post(m_impl->io,
+                      [=]()
+                      {
+                          std::scoped_lock lock(std::adopt_lock, *mutex);
+                          std::string buffer(static_cast<size_t>(bufferStringLen), '0');
+                          boost::asio::read(
+                              m_impl->serialPort, boost::asio::buffer(buffer), boost::asio::transfer_exactly(bufferStringLen), *error);
+                          if (*error)
+                          {
+                              return;
+                          }
+                          else
+                          {
+                              std::ostream os(&m_impl->readBuffer);
+                              os.write(buffer.c_str(), buffer.size());
+                          }
+                          size_t len;
+                          try
+                          {
+                              len = std::stoull(buffer);
+                          }
+                          catch (const std::exception&)
+                          {
+                              // str不是一个数字，即非visa二进制传输格式.
+                              while (avalible())
+                              {
+                                  boost::asio::read(m_impl->serialPort, m_impl->readBuffer, *error);
+                                  if (*error)
+                                  {
+                                      return;
+                                  }
+                              }
+                          }
+                          boost::asio::read(m_impl->serialPort, m_impl->readBuffer, boost::asio::transfer_at_least(len), *error);
+                      });
 
     if (!mutex->try_lock_for(m_attr.timeout()))
     {
@@ -286,7 +287,7 @@ std::string SerialPort::readAllBlockData(unsigned char bufferStringLen) const
         m_impl->serialPort.close();
         boost::asio::detail::throw_error(*error, "readAllBlockData");
     }
-    std::string buffer(boost::asio::buffer_cast<const char*>(m_impl->readBuffer.data()), m_impl->readBuffer.size());
+    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
     return buffer;
 }
 } // namespace OpenVisa

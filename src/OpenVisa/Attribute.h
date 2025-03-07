@@ -1,6 +1,6 @@
 ﻿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2024 LiLong                                              **
+**  Copyright (C) 2022-2025 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -92,6 +92,11 @@ public:
     [[nodiscard]] const std::string& deviceName() const;
     void setCommandVerify(bool enable);
     [[nodiscard]] bool commandVerify() const;
+    void setIOTraceEnable(bool en);
+    [[nodiscard]] bool ioTraceEnable() const;
+    void setIOTracePort(unsigned short port);
+    [[nodiscard]] unsigned short ioTracePort() const;
+    [[nodiscard]] unsigned short ioTraceVersion() const;
 
 protected:
     Attribute(std::shared_ptr<IOBase>* io);
