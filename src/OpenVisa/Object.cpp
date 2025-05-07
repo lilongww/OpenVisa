@@ -381,8 +381,8 @@ AddressVariant Object::fromVisaAddressString(const std::string& str)
         }
         else if (tokens.at(0).starts_with("usb"))
         {
-            auto visaTokens = split(addr, "::");
-            if (visaTokens.size() == 5 && !visaTokens[4].ends_with("instr"))
+            auto visaTokens = split(str, "::");
+            if (visaTokens.size() == 5 && !visaTokens[4].ends_with("instr") && !visaTokens[4].ends_with("INSTR"))
                 return std::monostate {};
             return Address<AddressType::USB>(static_cast<unsigned short>(std::stoul(visaTokens.at(1), nullptr, 16)),
                                              static_cast<unsigned short>(std::stoul(visaTokens.at(2), nullptr, 16)),
