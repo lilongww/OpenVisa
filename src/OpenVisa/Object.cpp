@@ -272,7 +272,7 @@ std::string Object::readAll()
                                }
                            });
     if (m_impl->attr.ioTraceEnable())
-        m_impl->getOrCreateIOTrace()->tx(m_impl->address, ret);
+        m_impl->getOrCreateIOTrace()->rx(m_impl->address, ret);
     return ret;
 }
 
