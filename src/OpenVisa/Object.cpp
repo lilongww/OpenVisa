@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <thread>
 
 template<typename... Args>
 struct Overload : public Args...
@@ -48,7 +49,10 @@ struct Object::Impl
     CommonCommand commonCommand;
     bool verified { false };
     std::string address;
-    inline Impl(Object& obj) : commonCommand(obj), attr(&io) {}
+    std::chrono::system_clock::duration beforeSendTime { std::chrono::system_clock::now().time_since_epoch() };
+    inline Impl(Object& obj) : commonCommand(obj), attr(&io)
+    {
+    }
     std::shared_ptr<IOTrace> getOrCreateIOTrace()
     {
         if (!ioTrace)
@@ -117,7 +121,12 @@ OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::Ser
         return {};
 
     std::string temp;
-    std::ranges::copy(addr.portName() | std::views::filter([](auto ch) { return ch >= '0' && ch <= '9'; }), std::back_inserter(temp));
+    std::ranges::copy(addr.portName() | std::views::filter(
+                                            [](auto ch)
+                                            {
+                                                return ch >= '0' && ch <= '9';
+                                            }),
+                      std::back_inserter(temp));
     try
     {
         auto port = std::stoul(temp);
@@ -138,12 +147,17 @@ OPENVISA_EXPORT std::string Object::toVisaAddressString<Address<AddressType::USB
 /*!
     \brief      构造函数.
 */
-Object::Object() : m_impl(std::make_unique<Impl>(*this)) {}
+Object::Object() : m_impl(std::make_unique<Impl>(*this))
+{
+}
 
 /*!
     \brief      析构函数.
 */
-Object::~Object() noexcept { close(); }
+Object::~Object() noexcept
+{
+    close();
+}
 
 /*!
     \brief      关闭仪器连接.
@@ -164,7 +178,11 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::RawSocket>>(const 
 {
     m_impl->attr.setTimeout(commandTimeout);
     auto socket = std::make_shared<RawSocket>(m_impl->attr);
-    visaReThrow(m_impl->attr, [&] { socket->connect(addr, openTimeout); });
+    visaReThrow(m_impl->attr,
+                [&]
+                {
+                    socket->connect(addr, openTimeout);
+                });
     m_impl->io = socket;
     afterConnected();
     m_impl->address = Object::toVisaAddressString(addr);
@@ -177,7 +195,11 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::SerialPort>>(const
 {
     m_impl->attr.setTimeout(commandTimeout);
     auto serialPort = std::make_shared<SerialPort>(m_impl->attr);
-    visaReThrow(m_impl->attr, [&] { serialPort->connect(addr, openTimeout); });
+    visaReThrow(m_impl->attr,
+                [&]
+                {
+                    serialPort->connect(addr, openTimeout);
+                });
     m_impl->io = serialPort;
     afterConnected();
     m_impl->address = Object::toVisaAddressString(addr);
@@ -192,13 +214,21 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::USB>>(const Addres
     if (std::ranges::any_of(IviUsbTmc::listUSB(), std::bind_front(std::equal_to {}, addr)))
     {
         auto usb = std::make_shared<IviUsbTmc>(m_impl->attr);
-        visaReThrow(m_impl->attr, [&] { usb->connect(addr, openTimeout); });
+        visaReThrow(m_impl->attr,
+                    [&]
+                    {
+                        usb->connect(addr, openTimeout);
+                    });
         m_impl->io = usb;
     }
     else
     {
         auto usb = std::make_shared<UsbTmc>(m_impl->attr);
-        visaReThrow(m_impl->attr, [&] { usb->connect(addr, openTimeout); });
+        visaReThrow(m_impl->attr,
+                    [&]
+                    {
+                        usb->connect(addr, openTimeout);
+                    });
         m_impl->io = usb;
     }
     afterConnected();
@@ -212,7 +242,11 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::VXI11>>(const Addr
 {
     m_impl->attr.setTimeout(commandTimeout);
     auto vxi11 = std::make_shared<VXI11>(m_impl->attr);
-    visaReThrow(m_impl->attr, [&] { vxi11->connect(addr, openTimeout); });
+    visaReThrow(m_impl->attr,
+                [&]
+                {
+                    vxi11->connect(addr, openTimeout);
+                });
     m_impl->io = vxi11;
     afterConnected();
     m_impl->address = Object::toVisaAddressString<Address<AddressType::VXI11>>(addr);
@@ -225,7 +259,11 @@ OPENVISA_EXPORT void Object::connectImpl<Address<AddressType::HiSLIP>>(const Add
 {
     m_impl->attr.setTimeout(commandTimeout);
     auto hiSLIP = std::make_shared<HiSLIP>(m_impl->attr);
-    visaReThrow(m_impl->attr, [&] { hiSLIP->connect(addr, openTimeout); });
+    visaReThrow(m_impl->attr,
+                [&]
+                {
+                    hiSLIP->connect(addr, openTimeout);
+                });
     m_impl->io = hiSLIP;
     afterConnected();
     m_impl->address = Object::toVisaAddressString(addr);
@@ -237,10 +275,19 @@ OPENVISA_EXPORT void Object::connectImpl<std::string>(const std::string& addr,
                                                       const std::chrono::milliseconds& commandTimeout /*= 5000*/)
 {
     AddressVariant addressVariant;
-    visaReThrow(m_impl->attr, [&] { addressVariant = fromVisaAddressString(addr); });
+    visaReThrow(m_impl->attr,
+                [&]
+                {
+                    addressVariant = fromVisaAddressString(addr);
+                });
     std::visit(Overload { [&](const std::monostate&)
-                          { visaThrow(m_impl->attr, std::make_error_code(std::errc::address_not_available).message()); },
-                          [&](const auto& addr) { connectImpl(addr, openTimeout, commandTimeout); } },
+                          {
+                              visaThrow(m_impl->attr, std::make_error_code(std::errc::address_not_available).message());
+                          },
+                          [&](const auto& addr)
+                          {
+                              connectImpl(addr, openTimeout, commandTimeout);
+                          } },
                addressVariant);
 }
 
@@ -272,7 +319,7 @@ std::string Object::readAll()
                                }
                            });
     if (m_impl->attr.ioTraceEnable())
-        m_impl->getOrCreateIOTrace()->tx(m_impl->address, ret);
+        m_impl->getOrCreateIOTrace()->rx(m_impl->address, ret);
     return ret;
 }
 
@@ -296,19 +343,31 @@ std::tuple<std::string, bool> Object::read(unsigned long blockSize)
 /*!
     \brief      返回仪器是否已连接.
 */
-bool Object::connected() const noexcept { return m_impl->io ? m_impl->io->connected() : false; }
+bool Object::connected() const noexcept
+{
+    return m_impl->io ? m_impl->io->connected() : false;
+}
 
 /*!
     \brief      返回属性设置.
 */
-Object::Attribute& Object::attribute() noexcept { return m_impl->attr; }
+Object::Attribute& Object::attribute() noexcept
+{
+    return m_impl->attr;
+}
 
-const Object::Attribute& Object::attribute() const noexcept { return m_impl->attr; }
+const Object::Attribute& Object::attribute() const noexcept
+{
+    return m_impl->attr;
+}
 
 /*!
     \brief      IEEE488.2公共指令接口.
 */
-Object::CommonCommand& Object::commonCommand() noexcept { return m_impl->commonCommand; }
+Object::CommonCommand& Object::commonCommand() noexcept
+{
+    return m_impl->commonCommand;
+}
 
 /*!
     \brief      移除字符串 \a source 尾部的终结符.
@@ -331,7 +390,13 @@ std::vector<std::string> Object::listSerialPorts()
 {
     auto ports = SerialPortInfo::listPorts();
     std::vector<std::string> names(ports.size());
-    std::transform(ports.begin(), ports.end(), names.begin(), [](const auto& port) { return port.portName(); });
+    std::transform(ports.begin(),
+                   ports.end(),
+                   names.begin(),
+                   [](const auto& port)
+                   {
+                       return port.portName();
+                   });
     return names;
 }
 
@@ -354,7 +419,12 @@ AddressVariant Object::fromVisaAddressString(const std::string& str)
     try
     {
         std::string addr;
-        std::ranges::transform(str, std::back_inserter(addr), [=](auto c) { return std::tolower(c); });
+        std::ranges::transform(str,
+                               std::back_inserter(addr),
+                               [=](auto c)
+                               {
+                                   return std::tolower(c);
+                               });
 
         auto tokens = split(addr, "::");
         if (tokens.size() < 2)
@@ -375,7 +445,12 @@ AddressVariant Object::fromVisaAddressString(const std::string& str)
         else if (tokens.at(0).starts_with("asrl"))
         {
             std::string temp;
-            std::ranges::copy(tokens.at(0) | std::views::filter([](auto ch) { return ch >= '0' && ch <= '9'; }), std::back_inserter(temp));
+            std::ranges::copy(tokens.at(0) | std::views::filter(
+                                                 [](auto ch)
+                                                 {
+                                                     return ch >= '0' && ch <= '9';
+                                                 }),
+                              std::back_inserter(temp));
             auto port = std::stoul(temp);
             return AddressVariant { Address<AddressType::SerialPort>(std::format("COM{}", port)) };
         }
@@ -398,6 +473,17 @@ AddressVariant Object::fromVisaAddressString(const std::string& str)
 void Object::sendImpl(const std::string& scpi)
 {
     throwNoConnection();
+
+    if (m_impl->attr.communicationInterval() != std::chrono::milliseconds { 0 }) // 通信间隔不为0时，等待通信间隔时间
+    {
+        while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch() -
+                                                                     m_impl->beforeSendTime) <= m_impl->attr.communicationInterval())
+        {
+            std::this_thread::yield();
+        }
+        m_impl->beforeSendTime = std::chrono::system_clock::now().time_since_epoch();
+    }
+
     if (m_impl->attr.autoAppendTerminalChars() && !scpi.ends_with(m_impl->attr.terminalChars()))
     {
         m_impl->io->send(scpi + m_impl->attr.terminalChars());
