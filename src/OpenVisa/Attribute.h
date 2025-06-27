@@ -97,6 +97,8 @@ public:
     void setIOTracePort(unsigned short port);
     [[nodiscard]] unsigned short ioTracePort() const;
     [[nodiscard]] unsigned short ioTraceVersion() const;
+    void setCommunicationInterval(const std::chrono::milliseconds& interval);
+    [[nodiscard]] const std::chrono::milliseconds& communicationInterval() const;
 
 protected:
     Attribute(std::shared_ptr<IOBase>* io);
