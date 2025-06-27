@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-    <namespace>com.openvisa.0.15.0</namespace>
+    <namespace>com.openvisa.0.17.0</namespace>
     <virtualFolder>openvisa</virtualFolder>
     <metaData name="version" value=""/>
     <customFilter name="OpenVisa">
@@ -110,6 +110,7 @@
             <keyword name="commandVerify" id="Attribute::commandVerify" ref="openvisa-object-attribute.html#commandVerify"/>
             <keyword name="commonCommand" id="Object::commonCommand" ref="openvisa-object.html#commonCommand"/>
             <keyword name="commonCommand" id="ObjectAdapter::commonCommand" ref="openvisa-objectadapter.html#commonCommand"/>
+            <keyword name="communicationInterval" id="Attribute::communicationInterval" ref="openvisa-object-attribute.html#communicationInterval"/>
             <keyword name="connected" id="Object::connected" ref="openvisa-object.html#connected"/>
             <keyword name="data" id="BinaryArray::data" ref="openvisa-binaryarray.html#data"/>
             <keyword name="dataBits" id="Attribute::dataBits" ref="openvisa-object-attribute.html#dataBits"/>
@@ -128,6 +129,9 @@
             <keyword name="hasProductId" id="SerialPortInfo::hasProductId" ref="openvisa-serialportinfo.html#hasProductId"/>
             <keyword name="hasVendorId" id="SerialPortInfo::hasVendorId" ref="openvisa-serialportinfo.html#hasVendorId"/>
             <keyword name="idn" id="CommonCommand::idn" ref="openvisa-object-commoncommand.html#idn"/>
+            <keyword name="ioTraceEnable" id="Attribute::ioTraceEnable" ref="openvisa-object-attribute.html#ioTraceEnable"/>
+            <keyword name="ioTracePort" id="Attribute::ioTracePort" ref="openvisa-object-attribute.html#ioTracePort"/>
+            <keyword name="ioTraceVersion" id="Attribute::ioTraceVersion" ref="openvisa-object-attribute.html#ioTraceVersion"/>
             <keyword name="listPorts" id="SerialPortInfo::listPorts" ref="openvisa-serialportinfo.html#listPorts"/>
             <keyword name="listSerialPorts" id="Object::listSerialPorts" ref="openvisa-object.html#listSerialPorts"/>
             <keyword name="listUSB" id="Object::listUSB" ref="openvisa-object.html#listUSB"/>
@@ -161,10 +165,13 @@
             <keyword name="setAutoAppendTerminalChars" id="Attribute::setAutoAppendTerminalChars" ref="openvisa-object-attribute.html#setAutoAppendTerminalChars"/>
             <keyword name="setBaudRate" id="Attribute::setBaudRate" ref="openvisa-object-attribute.html#setBaudRate"/>
             <keyword name="setCommandVerify" id="Attribute::setCommandVerify" ref="openvisa-object-attribute.html#setCommandVerify"/>
+            <keyword name="setCommunicationInterval" id="Attribute::setCommunicationInterval" ref="openvisa-object-attribute.html#setCommunicationInterval"/>
             <keyword name="setDataBits" id="Attribute::setDataBits" ref="openvisa-object-attribute.html#setDataBits"/>
             <keyword name="setDeviceName" id="Attribute::setDeviceName" ref="openvisa-object-attribute.html#setDeviceName"/>
             <keyword name="setEse" id="CommonCommand::setEse" ref="openvisa-object-commoncommand.html#setEse"/>
             <keyword name="setFlowControl" id="Attribute::setFlowControl" ref="openvisa-object-attribute.html#setFlowControl"/>
+            <keyword name="setIOTraceEnable" id="Attribute::setIOTraceEnable" ref="openvisa-object-attribute.html#setIOTraceEnable"/>
+            <keyword name="setIOTracePort" id="Attribute::setIOTracePort" ref="openvisa-object-attribute.html#setIOTracePort"/>
             <keyword name="setOpc" id="CommonCommand::setOpc" ref="openvisa-object-commoncommand.html#setOpc"/>
             <keyword name="setParity" id="Attribute::setParity" ref="openvisa-object-attribute.html#setParity"/>
             <keyword name="setSre" id="CommonCommand::setSre" ref="openvisa-object-commoncommand.html#setSre"/>
@@ -198,8 +205,6 @@
             <file>images/bullet_dn.png</file>
             <file>images/bullet_sq.png</file>
             <file>images/home.png</file>
-            <file>images/ico_note.png</file>
-            <file>images/ico_note_attention.png</file>
             <file>images/ico_out.png</file>
             <file>images/logo.png</file>
             <file>index.html</file>

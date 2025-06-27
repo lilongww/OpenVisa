@@ -326,7 +326,7 @@ bool Object::Attribute::commandVerify() const
 
 /*!
     \brief      设置 IO Trace 的端口号 \a port, 默认39167.
-    \sa         tracePort
+    \sa         ioTracePort
 */
 void Object::Attribute::setIOTracePort(unsigned short port)
 {
@@ -335,7 +335,7 @@ void Object::Attribute::setIOTracePort(unsigned short port)
 
 /*!
     \brief      返回 IO Trace 的端口号.
-    \sa         setTracePort
+    \sa         setIOTracePort
 */
 unsigned short Object::Attribute::ioTracePort() const
 {
