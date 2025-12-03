@@ -61,11 +61,75 @@ struct USBTMC_DRV_INFO
 
 static std::string getPath(const Address<AddressType::USB>& addr)
 {
-    return std::format("\\\\?\\usb#vid_{:04x}&pid_{:04x}#{}#{}",
-                       addr.vendorId(),
-                       addr.productId(),
-                       addr.serialNumber(),
-                       "{A9FDBB24-128A-11d5-9961-00108335E361}");
+    auto dev = SetupDiGetClassDevsW(&UsbTmcGuid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+
+    std::shared_ptr<void*> scope(nullptr,
+                                 [&](void*)
+                                 {
+                                     SetupDiDestroyDeviceInfoList(dev);
+                                 });
+
+    int deviceIndex = 0;
+    SP_DEVINFO_DATA data;
+    data.cbSize = sizeof(data);
+    while (SetupDiEnumDeviceInfo(dev, deviceIndex++, &data))
+    {
+        auto ident = _deviceInstanceIdentifier(data.DevInst);
+        bool hasMi;
+        uint16_t mi;
+        if (std::tie(hasMi, mi) = _parseIdent(ident, "MI_"); hasMi)
+        {
+            DEVINST parent;
+            if (CM_Get_Parent(&parent, data.DevInst, 0) == CR_SUCCESS)
+            {
+                ident = _deviceInstanceIdentifier(parent);
+            }
+        }
+
+        bool hasVid, hasPid;
+        uint16_t vid, pid;
+        std::string sn;
+        if (std::tie(hasVid, vid) = _parseIdent(ident, "VID_"); !hasVid)
+        {
+            std::tie(hasVid, vid) = _parseIdent(ident, "VEN_");
+        }
+        if (!hasVid)
+            continue;
+
+        if (std::tie(hasPid, pid) = _parseIdent(ident, "PID_"); !hasPid)
+        {
+            std::tie(hasPid, pid) = _parseIdent(ident, "DEV_");
+        }
+        if (!hasPid)
+            continue;
+
+        sn        = _parseSerialNumber(ident);
+
+        auto guid = _property(dev, data, SPDRP_BASE_CONTAINERID);
+        if ((addr.vendorId() == vid && addr.productId() == pid && addr.serialNumber() == sn))
+        {
+            SP_INTERFACE_DEVICE_DATA ifdata;
+            ifdata.cbSize = sizeof(ifdata);
+            if (!SetupDiEnumDeviceInterfaces(dev, NULL, &UsbTmcGuid, 0, &ifdata))
+            {
+                return {};
+            }
+
+            DWORD reqLen;
+            SetupDiGetDeviceInterfaceDetail(dev, &ifdata, NULL, 0, &reqLen, NULL);
+            PSP_INTERFACE_DEVICE_DETAIL_DATA ifDetail = (PSP_INTERFACE_DEVICE_DETAIL_DATA)(new TCHAR[reqLen]);
+
+            ifDetail->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
+            if (!SetupDiGetDeviceInterfaceDetail(dev, &ifdata, ifDetail, reqLen, NULL, NULL))
+            {
+                return {};
+            }
+            std::string path = ifDetail->DevicePath;
+            delete ifDetail;
+            return path;
+        }
+    }
+    return {};
 }
 
 static std::string getLastError()
@@ -117,7 +181,11 @@ struct IviUsbTmc::Impl
         DWORD writeBytes;
         OVERLAPPED overlapped {};
         overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-        std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
+        std::shared_ptr<void*> scope(nullptr,
+                                     [&](void*)
+                                     {
+                                         CloseHandle(overlapped.hEvent);
+                                     });
         overlapped.Offset     = 0;
         overlapped.OffsetHigh = 0;
         WriteFile(handle, buffer.c_str(), static_cast<DWORD>(buffer.size()), &writeBytes, &overlapped);
@@ -161,12 +229,19 @@ struct IviUsbTmc::Impl
     }
 
     IviUsbTmc* base;
-    inline Impl(IviUsbTmc* b) : base(b) {}
+    inline Impl(IviUsbTmc* b) : base(b)
+    {
+    }
 };
 
-IviUsbTmc::IviUsbTmc(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>(this)) { init(); }
+IviUsbTmc::IviUsbTmc(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>(this))
+{
+    init();
+}
 
-IviUsbTmc::~IviUsbTmc() {}
+IviUsbTmc::~IviUsbTmc()
+{
+}
 
 void IviUsbTmc::connect(const Address<AddressType::USB>& addr, const std::chrono::milliseconds& openTimeout)
 {
@@ -174,7 +249,7 @@ void IviUsbTmc::connect(const Address<AddressType::USB>& addr, const std::chrono
         getPath(addr).c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
     if (handle == INVALID_HANDLE_VALUE)
     {
-        throw std::exception("Open Usb failed.");
+        throw std::runtime_error(getLastError());
     }
     m_impl->handle = handle;
 }
@@ -192,7 +267,10 @@ void IviUsbTmc::send(const std::string& buffer) const
 }
 
 #undef max
-std::string IviUsbTmc::readAll() const { return read(std::numeric_limits<int>::max()); }
+std::string IviUsbTmc::readAll() const
+{
+    return read(std::numeric_limits<int>::max());
+}
 
 std::string IviUsbTmc::read(size_t size) const
 {
@@ -215,7 +293,11 @@ std::string IviUsbTmc::read(size_t size) const
             overlapped.Offset     = 0;
             overlapped.OffsetHigh = 0;
             overlapped.hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL);
-            std::shared_ptr<void*> scope(nullptr, [&](void*) { CloseHandle(overlapped.hEvent); });
+            std::shared_ptr<void*> scope(nullptr,
+                                         [&](void*)
+                                         {
+                                             CloseHandle(overlapped.hEvent);
+                                         });
             ReadFile(m_impl->handle, pack.data(), PacketSize, &transfered, &overlapped);
             wait(overlapped, m_attr.timeout());
             if (!GetOverlappedResult(m_impl->handle, &overlapped, &transfered, true))
@@ -237,9 +319,15 @@ void IviUsbTmc::close() noexcept
     }
 }
 
-bool IviUsbTmc::connected() const noexcept { return m_impl->handle; }
+bool IviUsbTmc::connected() const noexcept
+{
+    return m_impl->handle;
+}
 
-size_t IviUsbTmc::avalible() const noexcept { return m_impl->avalible; }
+size_t IviUsbTmc::avalible() const noexcept
+{
+    return m_impl->avalible;
+}
 
 std::vector<Address<AddressType::USB>> IviUsbTmc::listUSB()
 {
@@ -251,6 +339,16 @@ std::vector<Address<AddressType::USB>> IviUsbTmc::listUSB()
     while (SetupDiEnumDeviceInfo(dev, deviceIndex++, &data))
     {
         auto ident = _deviceInstanceIdentifier(data.DevInst);
+
+        if (auto [hasMi, _] = _parseIdent(ident, "MI_"); hasMi)
+        {
+            DEVINST parent;
+            if (CM_Get_Parent(&parent, data.DevInst, 0) == CR_SUCCESS)
+            {
+                ident = _deviceInstanceIdentifier(parent);
+            }
+        }
+
         bool hasVid, hasPid;
         uint16_t vid, pid;
         std::string sn;
@@ -281,7 +379,9 @@ void IviUsbTmc::reset()
     m_impl->reset(USBTMC_WRITE_DATA_PIPE);
 }
 
-void IviUsbTmc::init() {}
+void IviUsbTmc::init()
+{
+}
 
 } // namespace OpenVisa
 #endif
