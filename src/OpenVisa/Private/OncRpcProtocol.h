@@ -101,7 +101,7 @@ public:
         for (;;)
         {
             auto header = headerOf(c_str() + offset);
-            if (header.lastFragment)
+            if (header.lastFragment || !header.size)
                 return offset + header.size + 4 <= size();
             else if (size() >= offset + header.size + 4)
                 offset += header.size + 4;
@@ -388,9 +388,11 @@ public:
                         accept.ru.AR_results.wh   = buffer.data();
                         accept.ru.AR_results.size = static_cast<unsigned int>(buffer.size());
                         buffer.erase(buffer.begin(), buffer.begin() + m_dataSize);
-                        while (!lastFragment)
+                        while (!lastFragment && buffer.size())
                         {
                             auto header = buffer.headerSize();
+                            if (!header.size)
+                                return;
                             m_buffer.std::string::append(buffer.begin() + 4, buffer.begin() + header.size + 4);
                             buffer.erase(buffer.begin(), buffer.begin() + 4 + header.size);
                             lastFragment = header.lastFragment;
