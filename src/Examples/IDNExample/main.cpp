@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
         // obj.send(":SENSe1:SWEep:POINts?");
         // std::cout << obj.readAll() << std::endl;
         for (int i = 0; i < 10000; i++)
-            std::cout << obj.query("*IDN?\\");
+            std::cout << obj.query("*IDN?");
     }
     catch (const std::exception& e)
     {

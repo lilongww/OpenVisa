@@ -1,4 +1,4 @@
-# Format Style Options - Created with Clang Power Tools
+﻿# Format Style Options - Created with Clang Power Tools
 ---
 AccessModifierOffset: -4
 AlignConsecutiveAssignments: Consecutive
@@ -9,7 +9,7 @@ AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortLambdasOnASingleLine: false
 AllowShortEnumsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
