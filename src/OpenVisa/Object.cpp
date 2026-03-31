@@ -50,9 +50,7 @@ struct Object::Impl
     bool verified { false };
     std::string address;
     std::chrono::system_clock::duration beforeSendTime { std::chrono::system_clock::now().time_since_epoch() };
-    inline Impl(Object& obj) : commonCommand(obj), attr(&io)
-    {
-    }
+    inline Impl(Object& obj) : commonCommand(obj), attr(&io) {}
     std::shared_ptr<IOTrace> getOrCreateIOTrace()
     {
         if (!ioTrace)
@@ -320,6 +318,8 @@ std::string Object::readAll()
                            });
     if (m_impl->attr.ioTraceEnable())
         m_impl->getOrCreateIOTrace()->rx(m_impl->address, ret);
+    if (m_impl->attr.readTransform())
+        m_impl->attr.readTransform()(ret);
     return ret;
 }
 
@@ -486,15 +486,27 @@ void Object::sendImpl(const std::string& scpi)
 
     if (m_impl->attr.autoAppendTerminalChars() && !scpi.ends_with(m_impl->attr.terminalChars()))
     {
-        m_impl->io->send(scpi + m_impl->attr.terminalChars());
+        auto cmd = m_impl->attr.sendTransform() ? m_impl->attr.sendTransform()(scpi + m_impl->attr.terminalChars())
+                                                : scpi + m_impl->attr.terminalChars();
+        m_impl->io->send(cmd);
         if (m_impl->attr.ioTraceEnable())
-            m_impl->getOrCreateIOTrace()->tx(m_impl->address, scpi + m_impl->attr.terminalChars());
+            m_impl->getOrCreateIOTrace()->tx(m_impl->address, cmd);
     }
     else
     {
-        m_impl->io->send(scpi);
-        if (m_impl->attr.ioTraceEnable())
-            m_impl->getOrCreateIOTrace()->tx(m_impl->address, scpi);
+        if (m_impl->attr.sendTransform())
+        {
+            auto cmd = m_impl->attr.sendTransform()(scpi);
+            m_impl->io->send(cmd);
+            if (m_impl->attr.ioTraceEnable())
+                m_impl->getOrCreateIOTrace()->tx(m_impl->address, cmd);
+        }
+        else
+        {
+            m_impl->io->send(scpi);
+            if (m_impl->attr.ioTraceEnable())
+                m_impl->getOrCreateIOTrace()->tx(m_impl->address, scpi);
+        }
     }
     if (m_impl->attr.commandVerify() && !scpi.contains("?")) // 非查询指令直接进行指令验证
     {

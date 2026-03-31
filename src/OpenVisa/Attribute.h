@@ -22,6 +22,7 @@
 
 #include <chrono>
 #include <optional>
+#include <functional>
 
 namespace OpenVisa
 {
@@ -99,6 +100,10 @@ public:
     [[nodiscard]] unsigned short ioTraceVersion() const;
     void setCommunicationInterval(const std::chrono::milliseconds& interval);
     [[nodiscard]] const std::chrono::milliseconds& communicationInterval() const;
+    void setSendTransform(const std::function<std::string(std::string_view)>& transform);
+    [[nodiscard]] const std::function<std::string(std::string_view)>& sendTransform() const;
+    void setReadTransform(const std::function<void(std::string&)>& transform);
+    [[nodiscard]] const std::function<void(std::string&)>& readTransform() const;
 
 protected:
     Attribute(std::shared_ptr<IOBase>* io);
