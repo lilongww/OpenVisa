@@ -1,6 +1,6 @@
 ﻿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2025 LiLong                                              **
+**  Copyright (C) 2022-2026 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -133,7 +133,11 @@ struct VisaAdl
         }                                                                                                                                  \
         inline static void fromScpi(const std::string& scpi, Enum& e)                                                                      \
         {                                                                                                                                  \
-            if (auto it = std::ranges::find_if(m_enumStrings, [&](const auto& str) { return scpi.starts_with(str); });                     \
+            if (auto it = std::ranges::find_if(m_enumStrings,                                                                              \
+                                               [&](const auto& str)                                                                        \
+                                               {                                                                                           \
+                                                   return scpi.starts_with(str);                                                           \
+                                               });                                                                                         \
                 it != m_enumStrings.end())                                                                                                 \
                 e = static_cast<Enum>(std::distance(m_enumStrings.begin(), it) + static_cast<Int>(EnumBegin));                             \
             else                                                                                                                           \

@@ -1,6 +1,6 @@
 ﻿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2025 LiLong                                              **
+**  Copyright (C) 2022-2026 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -38,13 +38,11 @@ struct Object::Attribute::Impl
     bool ioTraceEnable { true };
     unsigned short tracePort { 39167 };
     std::chrono::milliseconds communicationInterval { 0 };
-    inline Impl(std::shared_ptr<IOBase>* _io) : io(_io)
-    {
-    }
-    inline std::shared_ptr<SerialPort> asSerialPort() const
-    {
-        return io ? std::dynamic_pointer_cast<SerialPort>(*io) : nullptr;
-    }
+    std::function<std::string(std::string_view)> sendTransform;
+    std::function<void(std::string&)> readTransform;
+
+    inline Impl(std::shared_ptr<IOBase>* _io) : io(_io) {}
+    inline std::shared_ptr<SerialPort> asSerialPort() const { return io ? std::dynamic_pointer_cast<SerialPort>(*io) : nullptr; }
 };
 
 /*!
@@ -386,6 +384,44 @@ void Object::Attribute::setCommunicationInterval(const std::chrono::milliseconds
 const std::chrono::milliseconds& Object::Attribute::communicationInterval() const
 {
     return m_impl->communicationInterval;
+}
+
+/*!
+    \brief      设置发送指令转换函数 \a transform, 该函数用于在发送指令前对指令进行转换，转换后的指令将被发送到设备.
+    \note       该函数的参数为指令字符串的引用，可以在函数中对指令进行修改，修改后的指令将被发送到设备.
+    \sa         sendTransform
+*/
+void Object::Attribute::setSendTransform(const std::function<std::string(std::string_view)>& transform)
+{
+    m_impl->sendTransform = transform;
+}
+
+/*!
+    \brief      返回指令转换函数.
+    \sa         setSendTransform
+*/
+const std::function<std::string(std::string_view)>& Object::Attribute::sendTransform() const
+{
+    return m_impl->sendTransform;
+}
+
+/*!
+    \brief      设置读取数据转换函数 \a transform, 该函数用于在读取数据后对数据进行转换，转换后的数据将被返回给用户.
+    \note       该函数的参数为读取到的数据字符串的引用，可以在函数中对数据进行修改，修改后的数据将被返回给用户.
+    \sa         readTransform
+*/
+void Object::Attribute::setReadTransform(const std::function<void(std::string&)>& transform)
+{
+    m_impl->readTransform = transform;
+}
+
+/*!
+    \brief      返回读取数据转换函数.
+    \sa         setReadTransform
+*/
+const std::function<void(std::string&)>& Object::Attribute::readTransform() const
+{
+    return m_impl->readTransform;
 }
 
 } // namespace OpenVisa
