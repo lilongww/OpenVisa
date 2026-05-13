@@ -21,6 +21,7 @@
 #include "Endian.h"
 
 #include <array>
+#include <memory>
 #include <string>
 
 namespace OpenVisa
@@ -109,13 +110,13 @@ public:
     inline void append(const T bytes)
     {
         auto val = toBigEndian(bytes);
-        std::string::append(reinterpret_cast<const char*>(&val), sizeof(T));
+        std::string::append(std::start_lifetime_as_array<const char>(&val, sizeof(T)), sizeof(T));
     }
     template<typename T>
     requires std::is_arithmetic_v<T> || std::is_enum_v<T>
     inline size_t take(T& val)
     {
-        val = fromBigEndian(*reinterpret_cast<T*>(data()));
+        val = fromBigEndian(*std::start_lifetime_as<T>(data()));
         erase(begin(), begin() + sizeof(T));
         return sizeof(T);
     }
@@ -126,7 +127,10 @@ public:
         return false;
     }
     inline MessageType messageType() const { return static_cast<MessageType>(*(c_str() + 2)); }
-    inline size_t payloadLength() const { return fromBigEndian(*reinterpret_cast<const size_t*>(&(c_str()[sizeof(MessageHeader) - 8]))); }
+    inline size_t payloadLength() const
+    {
+        return fromBigEndian(*std::start_lifetime_as<const size_t>(&(c_str()[sizeof(MessageHeader) - 8])));
+    }
     inline bool isEnough() const noexcept // 字节数足够
     {
         if (sizeof(MessageHeader) > size())

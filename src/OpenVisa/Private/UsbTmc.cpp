@@ -54,7 +54,10 @@ static int transfer(libusb_device_handle* dev_handle,
     return r;
 }
 
-[[noreturn]] inline void throwLibusbError(int code) { throw std::exception(libusb_strerror(code)); }
+[[noreturn]] inline void throwLibusbError(int code)
+{
+    throw std::exception(libusb_strerror(code));
+}
 
 static std::string getStringDescriptor(libusb_device_handle* handle, uint8_t descIndex)
 {
@@ -75,7 +78,7 @@ static std::string getStringDescriptor(libusb_device_handle* handle, uint8_t des
     if (r < 4)
     {
         if (libusb_get_string_descriptor_ascii(handle, descIndex, data, 128) > 0)
-            return std::string(reinterpret_cast<char*>(data));
+            return std::string(std::start_lifetime_as_array<char>(data, 128));
     }
 
     if (data[0] > r || data[1] != LIBUSB_DT_STRING)
@@ -166,9 +169,15 @@ struct UsbTmc::Impl
     }
 };
 
-UsbTmc::UsbTmc(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>()) { init(); }
+UsbTmc::UsbTmc(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>())
+{
+    init();
+}
 
-UsbTmc::~UsbTmc() { libusb_exit(m_impl->context); }
+UsbTmc::~UsbTmc()
+{
+    libusb_exit(m_impl->context);
+}
 
 void UsbTmc::connect(const Address<AddressType::USB>& addr, const std::chrono::milliseconds& openTimeout)
 {
@@ -273,7 +282,7 @@ void UsbTmc::send(const std::string& buffer) const
     {
         if (auto code = transfer(m_impl->handle,
                                  m_impl->endpoint_out,
-                                 reinterpret_cast<unsigned char*>(msg.data()),
+                                 std::start_lifetime_as_array<unsigned char>(msg.data(), msg.size()),
                                  static_cast<int>(msg.size()),
                                  nullptr,
                                  static_cast<unsigned int>(m_attr.timeout().count()));
@@ -285,7 +294,10 @@ void UsbTmc::send(const std::string& buffer) const
     }
 }
 #undef max
-std::string UsbTmc::readAll() const { return read(std::numeric_limits<int>::max()); }
+std::string UsbTmc::readAll() const
+{
+    return read(std::numeric_limits<int>::max());
+}
 
 std::string UsbTmc::read(size_t size) const
 {
@@ -300,7 +312,7 @@ std::string UsbTmc::read(size_t size) const
             std::string requrestBuffer = BulkRequest(m_impl->tag, static_cast<unsigned int>(size - buffer.size()));
             if (auto code = transfer(m_impl->handle,
                                      m_impl->endpoint_out,
-                                     reinterpret_cast<unsigned char*>(requrestBuffer.data()),
+                                     std::start_lifetime_as_array<unsigned char>(requrestBuffer.data(), requrestBuffer.size()),
                                      static_cast<int>(requrestBuffer.size()),
                                      nullptr,
                                      static_cast<unsigned int>(m_attr.timeout().count()));
@@ -316,7 +328,7 @@ std::string UsbTmc::read(size_t size) const
             pack.resize(m_impl->inMaxPacketSize);
             if (auto code = transfer(m_impl->handle,
                                      m_impl->endpoint_in,
-                                     reinterpret_cast<unsigned char*>(pack.data()),
+                                     std::start_lifetime_as_array<unsigned char>(pack.data(), pack.size()),
                                      static_cast<int>(pack.size()),
                                      &transfered,
                                      static_cast<unsigned int>(m_attr.timeout().count()));
@@ -343,9 +355,15 @@ void UsbTmc::close() noexcept
     }
 }
 
-bool UsbTmc::connected() const noexcept { return m_impl->handle; }
+bool UsbTmc::connected() const noexcept
+{
+    return m_impl->handle;
+}
 
-size_t UsbTmc::avalible() const noexcept { return m_impl->avalibe; }
+size_t UsbTmc::avalible() const noexcept
+{
+    return m_impl->avalibe;
+}
 
 std::vector<OpenVisa::Address<OpenVisa::AddressType::USB>> UsbTmc::listUSB()
 {
@@ -362,7 +380,10 @@ std::vector<OpenVisa::Address<OpenVisa::AddressType::USB>> UsbTmc::listUSB()
 #endif
                                                     return context;
                                                 }),
-                                            [](auto context) { libusb_exit(context); });
+                                            [](auto context)
+                                            {
+                                                libusb_exit(context);
+                                            });
     libusb_device** devs;
 
     auto count = libusb_get_device_list(context.get(), &devs);
@@ -418,7 +439,10 @@ std::vector<OpenVisa::Address<OpenVisa::AddressType::USB>> UsbTmc::listUSB()
     return address;
 }
 
-void UsbTmc::reset() { libusb_reset_device(m_impl->handle); }
+void UsbTmc::reset()
+{
+    libusb_reset_device(m_impl->handle);
+}
 
 void UsbTmc::init()
 {

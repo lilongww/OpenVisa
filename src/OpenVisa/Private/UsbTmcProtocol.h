@@ -59,7 +59,10 @@ public:
             : m_msgId(msgId), m_tag(tag), m_tagInverse(~tag), m_transferSize(size), m_bmTransfer(lastPack)
         {
         }
-        inline operator std::string() const { return std::string(reinterpret_cast<const char*>(this), sizeof(*this)); }
+        inline operator std::string() const
+        {
+            return std::string(std::start_lifetime_as_array<const char>(this, sizeof(*this)), sizeof(*this));
+        }
 
     private:
         unsigned char m_msgId;
@@ -85,13 +88,13 @@ public:
         int loop = static_cast<int>(std::ceil((m_buffer.size() + sizeof(Header)) / static_cast<double>(m_maxPacketSize)));
         std::vector<std::string> buffers(loop);
         int realPackSize = m_maxPacketSize - sizeof(Header);
-        for (int i = 0; i < loop; i++) //分包，每包最大m_maxPacketSize
+        for (int i = 0; i < loop; i++) // 分包，每包最大m_maxPacketSize
         {
             bool lastPack    = i == loop - 1;
             auto currentSize = static_cast<int>(lastPack ? m_buffer.size() - i * realPackSize : realPackSize);
             buffers[i].append(Header(m_msgId, m_tag, currentSize, lastPack));
             buffers[i].append(m_buffer.c_str() + i * realPackSize, currentSize);
-            if (auto multiOf4 = buffers[i].size() % 4; multiOf4) //每包必须为4的倍数
+            if (auto multiOf4 = buffers[i].size() % 4; multiOf4) // 每包必须为4的倍数
             {
                 std::string empty;
                 empty.resize(4 - multiOf4, 0x00);
@@ -134,7 +137,7 @@ public:
         header.m_tag          = m_tag;
         header.m_tagInverse   = ~header.m_tag;
         header.m_transferSize = m_transferSize;
-        return std::string(reinterpret_cast<char*>(&header), sizeof(header));
+        return std::string(std::start_lifetime_as_array<char>(&header, sizeof(header)), sizeof(header));
     }
 
 private:
@@ -166,7 +169,7 @@ public:
     {
         if (buffer.size() < sizeof(Header))
             return false;
-        auto header = reinterpret_cast<const Header*>(buffer.c_str());
+        auto header = std::start_lifetime_as<const Header>(buffer.c_str());
 
         if (header->m_transferSize + sizeof(Header) > buffer.size())
             return false;

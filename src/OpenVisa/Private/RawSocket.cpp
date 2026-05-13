@@ -101,7 +101,11 @@ void RawSocket::send(const std::string& buffer) const
 
 std::string RawSocket::readAll() const
 {
-    std::shared_ptr<void> scope(nullptr, [=](void*) { m_impl->readBuffer.consume(m_impl->readBuffer.size()); });
+    std::shared_ptr<void> scope(nullptr,
+                                [=](void*)
+                                {
+                                    m_impl->readBuffer.consume(m_impl->readBuffer.size());
+                                });
     if (m_attr.terminalCharsEnable())
     {
         auto header = read(2);
@@ -163,7 +167,10 @@ void RawSocket::close() noexcept
     m_impl->socket.close(ec);
 }
 
-bool RawSocket::connected() const noexcept { return m_impl->socket.is_open(); }
+bool RawSocket::connected() const noexcept
+{
+    return m_impl->socket.is_open();
+}
 
 size_t RawSocket::avalible() const noexcept
 {
@@ -171,7 +178,10 @@ size_t RawSocket::avalible() const noexcept
     return m_impl->socket.is_open() ? m_impl->socket.available(e) : 0UL;
 }
 
-void RawSocket::reset() { m_impl->readBuffer.consume(m_impl->readBuffer.size()); }
+void RawSocket::reset()
+{
+    m_impl->readBuffer.consume(m_impl->readBuffer.size());
+}
 
 std::string RawSocket::readAllAscii() const
 {
@@ -199,7 +209,8 @@ std::string RawSocket::readAllAscii() const
         m_impl->socket.close();
         boost::asio::detail::throw_error(*error, "readAllAscii");
     }
-    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
+    std::string buffer(std::start_lifetime_as_array<const char>(m_impl->readBuffer.data().data(), m_impl->readBuffer.size()),
+                       m_impl->readBuffer.size());
     return buffer;
 }
 
@@ -211,43 +222,44 @@ std::string RawSocket::readAllBlockData(unsigned char bufferStringLen) const
     auto size      = std::make_shared<std::size_t>(0);
     auto isTimeout = std::make_shared<std::atomic_bool>(false);
     boost::asio::post(m_impl->io,
-        [=]()
-        {
-            std::scoped_lock lock(std::adopt_lock, *mutex);
-            std::string buffer(static_cast<size_t>(bufferStringLen), '0');
-            if (!*isTimeout)
-                boost::asio::read(m_impl->socket, boost::asio::buffer(buffer), boost::asio::transfer_exactly(bufferStringLen), *error);
-            if (*error)
-            {
-                return;
-            }
-            else
-            {
-                std::ostream os(&m_impl->readBuffer);
-                os.write(buffer.c_str(), buffer.size());
-            }
-            size_t len;
-            try
-            {
-                len = std::stoull(buffer);
-            }
-            catch (const std::exception&)
-            {
-                // str不是一个数字，即非visa二进制传输格式.
-                while (m_impl->socket.available())
-                {
-                    if (*isTimeout)
-                        return;
-                    boost::asio::read(m_impl->socket, m_impl->readBuffer, *error);
-                    if (*error)
-                    {
-                        return;
-                    }
-                }
-            }
-            if (!*isTimeout)
-                boost::asio::read(m_impl->socket, m_impl->readBuffer, boost::asio::transfer_at_least(len), *error);
-        });
+                      [=]()
+                      {
+                          std::scoped_lock lock(std::adopt_lock, *mutex);
+                          std::string buffer(static_cast<size_t>(bufferStringLen), '0');
+                          if (!*isTimeout)
+                              boost::asio::read(
+                                  m_impl->socket, boost::asio::buffer(buffer), boost::asio::transfer_exactly(bufferStringLen), *error);
+                          if (*error)
+                          {
+                              return;
+                          }
+                          else
+                          {
+                              std::ostream os(&m_impl->readBuffer);
+                              os.write(buffer.c_str(), buffer.size());
+                          }
+                          size_t len;
+                          try
+                          {
+                              len = std::stoull(buffer);
+                          }
+                          catch (const std::exception&)
+                          {
+                              // str不是一个数字，即非visa二进制传输格式.
+                              while (m_impl->socket.available())
+                              {
+                                  if (*isTimeout)
+                                      return;
+                                  boost::asio::read(m_impl->socket, m_impl->readBuffer, *error);
+                                  if (*error)
+                                  {
+                                      return;
+                                  }
+                              }
+                          }
+                          if (!*isTimeout)
+                              boost::asio::read(m_impl->socket, m_impl->readBuffer, boost::asio::transfer_at_least(len), *error);
+                      });
 
     if (!mutex->try_lock_for(m_attr.timeout()))
     {
@@ -260,7 +272,8 @@ std::string RawSocket::readAllBlockData(unsigned char bufferStringLen) const
         m_impl->socket.close();
         boost::asio::detail::throw_error(*error, "readAllBlockData");
     }
-    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
+    std::string buffer(std::start_lifetime_as_array<const char>(m_impl->readBuffer.data().data(), m_impl->readBuffer.size()),
+                       m_impl->readBuffer.size());
     return buffer;
 }
 } // namespace OpenVisa

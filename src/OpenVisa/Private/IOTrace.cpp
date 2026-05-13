@@ -62,7 +62,7 @@ private:
     requires std::is_integral_v<T>
     inline void serialize(std::string& buf, T value) const
     {
-        auto begin = reinterpret_cast<const char*>(&value);
+        auto begin = std::start_lifetime_as_array<const char>(&value, sizeof(T));
         buf.append_range(std::string_view(begin, sizeof(T)));
     }
 };
@@ -73,13 +73,23 @@ struct IOTrace::Impl
     boost::asio::ip::udp::socket socket { io_context, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0) };
 };
 
-IOTrace::IOTrace(Object::Attribute const& attr) : m_impl(std::make_unique<Impl>()), m_attr(attr) {}
+IOTrace::IOTrace(Object::Attribute const& attr) : m_impl(std::make_unique<Impl>()), m_attr(attr)
+{
+}
 
-IOTrace::~IOTrace() {}
+IOTrace::~IOTrace()
+{
+}
 
-void IOTrace::tx(const std::string& address, const std::string& data) { trace(true, address, data); }
+void IOTrace::tx(const std::string& address, const std::string& data)
+{
+    trace(true, address, data);
+}
 
-void IOTrace::rx(const std::string& address, const std::string& data) { trace(false, address, data); }
+void IOTrace::rx(const std::string& address, const std::string& data)
+{
+    trace(false, address, data);
+}
 
 void IOTrace::trace(bool tx, const std::string& address, const std::string& data)
 {

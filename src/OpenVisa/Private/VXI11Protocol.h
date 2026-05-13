@@ -20,6 +20,8 @@
 
 #include "OncRpcProtocol.h"
 
+#include <memory>
+
 namespace OpenVisa
 {
 inline namespace VXI
@@ -154,7 +156,7 @@ public:
         buffer.append(m_linkId);
         buffer.append(m_ioTimeout);
         buffer.append(m_lockTimeout);
-        buffer.append(*reinterpret_cast<const long*>(&m_flags));
+        buffer.append(*std::start_lifetime_as<const long>(&m_flags));
         buffer.append(static_cast<unsigned int>(m_data.size()));
         if (!m_data.empty())
         {
@@ -201,7 +203,7 @@ public:
         buffer.append(m_requestSize);
         buffer.append(m_ioTimeout);
         buffer.append(m_lockTimeout);
-        buffer.append(*reinterpret_cast<const unsigned long*>(&m_flags));
+        buffer.append(*std::start_lifetime_as<const unsigned long>(&m_flags));
         buffer.append(m_termChar);
         setSizeByte(buffer, true);
         return buffer;
@@ -312,7 +314,7 @@ public:
         {
             auto buffer = this->buffer();
             auto offset = buffer.take(m_error);
-            offset += buffer.take(reinterpret_cast<long&>(m_reason));
+            offset += buffer.take(*std::start_lifetime_as<long>(&m_reason));
             if (m_dataSize == 8)
             {
                 m_buffer = std::string {};

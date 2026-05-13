@@ -90,7 +90,11 @@ void SerialPort::send(const std::string& buffer) const
 
 std::string SerialPort::readAll() const
 {
-    std::shared_ptr<void> scope(nullptr, [=](void*) { m_impl->readBuffer.consume(m_impl->readBuffer.size()); });
+    std::shared_ptr<void> scope(nullptr,
+                                [=](void*)
+                                {
+                                    m_impl->readBuffer.consume(m_impl->readBuffer.size());
+                                });
     if (m_attr.terminalCharsEnable())
     {
         auto header = read(2);
@@ -152,7 +156,10 @@ void SerialPort::close() noexcept
     m_impl->serialPort.close(ec);
 }
 
-bool SerialPort::connected() const noexcept { return m_impl->serialPort.is_open(); }
+bool SerialPort::connected() const noexcept
+{
+    return m_impl->serialPort.is_open();
+}
 
 size_t SerialPort::avalible() const noexcept
 {
@@ -181,7 +188,10 @@ size_t SerialPort::avalible() const noexcept
 #endif
 }
 
-void SerialPort::setBaudRate(unsigned int baud) { m_impl->serialPort.set_option(boost::asio::serial_port::baud_rate { baud }); }
+void SerialPort::setBaudRate(unsigned int baud)
+{
+    m_impl->serialPort.set_option(boost::asio::serial_port::baud_rate { baud });
+}
 
 void SerialPort::setDataBits(DataBits bits)
 {
@@ -203,7 +213,10 @@ void SerialPort::setStopBits(StopBits bits)
     m_impl->serialPort.set_option(boost::asio::serial_port::stop_bits { static_cast<boost::asio::serial_port::stop_bits::type>(bits) });
 }
 
-void SerialPort::reset() { m_impl->readBuffer.consume(m_impl->readBuffer.size()); }
+void SerialPort::reset()
+{
+    m_impl->readBuffer.consume(m_impl->readBuffer.size());
+}
 
 std::string SerialPort::readAllAscii() const
 {
@@ -231,7 +244,8 @@ std::string SerialPort::readAllAscii() const
         m_impl->serialPort.close();
         boost::asio::detail::throw_error(*error, "readAllAscii");
     }
-    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
+    std::string buffer(std::start_lifetime_as_array<const char>(m_impl->readBuffer.data().data(), m_impl->readBuffer.size()),
+                       m_impl->readBuffer.size());
     return buffer;
 }
 
@@ -287,7 +301,8 @@ std::string SerialPort::readAllBlockData(unsigned char bufferStringLen) const
         m_impl->serialPort.close();
         boost::asio::detail::throw_error(*error, "readAllBlockData");
     }
-    std::string buffer(reinterpret_cast<const char*>(m_impl->readBuffer.data().data()), m_impl->readBuffer.size());
+    std::string buffer(std::start_lifetime_as_array<const char>(m_impl->readBuffer.data().data(), m_impl->readBuffer.size()),
+                       m_impl->readBuffer.size());
     return buffer;
 }
 } // namespace OpenVisa

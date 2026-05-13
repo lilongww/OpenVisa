@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.20)
-project(OpenVisa VERSION "0.18.0")
+project(OpenVisa VERSION "0.19.0")
 enable_testing()
 
 set(Boost_NO_WARN_NEW_VERSIONS 1)
@@ -17,16 +17,12 @@ else()
     set(_platform "Win32")
 endif(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_DEBUG_POSTFIX "d")
 
 if(MSVC)
   add_compile_options(/W3 /wd4251)
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.12.25835)
-    set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
-    set(CMAKE_CXX20_EXTENSION_COMPILE_OPTION "-std:c++latest")
-  endif()
 endif()
 
 find_path(LIBUSB_INCLUDEDIR libusb.h

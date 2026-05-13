@@ -59,7 +59,8 @@ TEST(ArrayTest, BinaryArray_string)
     buffer[1] = '2';
     buffer[2] = '1';
     buffer[3] = '6';
-    std::string v { reinterpret_cast<const char*>(vec1.data()), vec1.size() * sizeof(std::vector<double>::value_type) };
+    std::string v { std::start_lifetime_as_array<const char>(vec1.data(), vec1.size() * sizeof(std::vector<double>::value_type)),
+                    vec1.size() * sizeof(std::vector<double>::value_type) };
     memcpy(buffer.data() + 4, vec1.data(), vec1.size() * sizeof(double));
     EXPECT_EQ(v, static_cast<std::string>(OpenVisa::BinaryArray<std::string>(std::move(buffer))));
 }
@@ -72,7 +73,8 @@ TEST(ArrayTest, BinaryArray_wstring)
     buffer[1] = '2';
     buffer[2] = '1';
     buffer[3] = '6';
-    std::wstring v { reinterpret_cast<const wchar_t*>(vec1.data()),
+    std::wstring v { std::start_lifetime_as_array<const wchar_t>(vec1.data(),
+                                                                 vec1.size() * sizeof(std::vector<double>::value_type) / sizeof(wchar_t)),
                      vec1.size() * sizeof(std::vector<double>::value_type) / sizeof(wchar_t) };
     memcpy(buffer.data() + 4, vec1.data(), vec1.size() * sizeof(double));
     EXPECT_EQ(v, static_cast<std::wstring>(OpenVisa::BinaryArray<std::wstring>(std::move(buffer))));

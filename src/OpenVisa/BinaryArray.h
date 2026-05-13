@@ -18,6 +18,7 @@
 **********************************************************************************/
 #pragma once
 
+#include <memory>
 #include <vector>
 
 namespace OpenVisa
@@ -41,7 +42,7 @@ public:
         std::size_t byteCount;
         std::from_chars(m_temp.c_str() + byteCountBeginOffset, m_temp.c_str() + dataBeginOffset, byteCount);
         m_size = byteCount / sizeof(Type);
-        m_data = reinterpret_cast<const Type*>(m_temp.c_str() + dataBeginOffset);
+        m_data = std::start_lifetime_as<const Type>(m_temp.c_str() + dataBeginOffset);
     }
     [[nodiscard]] inline BinaryArray(BinaryArray&& other) : m_temp(std::move(other.m_temp)), m_data(other.m_data), m_size(other.m_size) {}
     [[nodiscard]] inline std::size_t size() const { return m_size; }
@@ -82,7 +83,7 @@ public:
         std::size_t byteCount;
         std::from_chars(m_temp.c_str() + byteCountBeginOffset, m_temp.c_str() + dataBeginOffset, byteCount);
         auto size = byteCount / sizeof(T);
-        m_data    = View(reinterpret_cast<const T*>(m_temp.c_str() + dataBeginOffset), size);
+        m_data    = View(std::start_lifetime_as<const T>(m_temp.c_str() + dataBeginOffset), size);
     }
     [[nodiscard]] inline BinaryArray(BinaryArray&& other) : m_temp(std::move(other.m_temp)), m_data(std::move(other.m_data)) {}
     [[nodiscard]] inline std::size_t size() const { return m_data.size(); }

@@ -81,13 +81,13 @@ public:
     inline void append(const T bytes)
     {
         auto val = toBigEndian(bytes);
-        std::string::append(reinterpret_cast<const char*>(&val), sizeof(T));
+        std::string::append(std::start_lifetime_as_array<const char>(&val, sizeof(T)), sizeof(T));
     }
     template<typename T>
     requires std::is_arithmetic_v<T> || std::is_enum_v<T>
     inline size_t take(T& val)
     {
-        val = fromBigEndian(*reinterpret_cast<T*>(data()));
+        val = fromBigEndian(*std::start_lifetime_as<T>(data()));
         erase(begin(), begin() + sizeof(T));
         return sizeof(T);
     }
@@ -114,8 +114,8 @@ public:
 private:
     inline TcpHeader headerOf(const char* ptr) const
     {
-        auto tmp = fromBigEndian(*reinterpret_cast<const unsigned int*>(ptr));
-        return reinterpret_cast<TcpHeader&>(tmp);
+        auto tmp = fromBigEndian(*std::start_lifetime_as<const unsigned int>(ptr));
+        return *std::start_lifetime_as<TcpHeader>(&tmp);
     }
 };
 
@@ -301,9 +301,9 @@ public:
         if constexpr (type == Proto::TCP)
         { // TCP首先发送负字节数
             TcpHeader header;
-            header.lastFragment                    = lastFragment;
-            header.size                            = buffer.size() - 4;
-            *reinterpret_cast<int*>(buffer.data()) = toBigEndian<int>(*reinterpret_cast<int*>(&header));
+            header.lastFragment                         = lastFragment;
+            header.size                                 = buffer.size() - 4;
+            *std::start_lifetime_as<int>(buffer.data()) = toBigEndian<int>(*std::start_lifetime_as<int>(&header));
         }
     }
 
@@ -462,7 +462,7 @@ public:
     void parse(RPCBuffer& buffer, unsigned int xid) override
     {
         RpcReply<type>::parse(buffer, xid);
-        m_port = fromBigEndian(*reinterpret_cast<const unsigned int*>(RpcReply<type>::buffer().c_str()));
+        m_port = fromBigEndian(*std::start_lifetime_as<const unsigned int>(RpcReply<type>::buffer().c_str()));
     }
 
 private:
