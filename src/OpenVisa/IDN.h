@@ -1,6 +1,6 @@
 ﻿/*********************************************************************************
 **                                                                              **
-**  Copyright (C) 2022-2025 LiLong                                              **
+**  Copyright (C) 2022-2026 LiLong                                              **
 **  This file is part of OpenVisa.                                              **
 **                                                                              **
 **  OpenVisa is free software: you can redistribute it and/or modify            **
@@ -29,8 +29,11 @@ class IDN
 public:
     inline IDN(const std::string& source)
     {
-        auto view =
-            std::views::split(source, ',') | std::views::transform([](const auto& view) { return std::string(view.begin(), view.end()); });
+        auto view = std::views::split(source, ',') | std::views::transform(
+                                                         [](const auto& view)
+                                                         {
+                                                             return std::string(view.begin(), view.end());
+                                                         });
         m_datas = std::vector<std::string>(view.begin(), view.end());
         if (m_datas.size() != 4)
             throw std::exception("Nonstandard IDN string.");
