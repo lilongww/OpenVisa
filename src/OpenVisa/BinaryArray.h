@@ -29,7 +29,7 @@ class BinaryArray
 public:
     using Type     = T;
     using Iterator = const Type*;
-    [[nodiscard]] inline BinaryArray(std::string&& buffer) : m_temp(buffer)
+    [[nodiscard]] inline BinaryArray(std::string&& buffer) : m_temp(std::forward<std::string&&>(buffer))
     {
         if (m_temp.empty())
             return;
@@ -70,7 +70,7 @@ public:
     using Type     = std::basic_string<T>;
     using View     = std::basic_string_view<T>;
     using Iterator = typename View::const_iterator;
-    [[nodiscard]] inline BinaryArray(std::string&& buffer) : m_temp(buffer)
+    [[nodiscard]] inline BinaryArray(std::string&& buffer) : m_temp(std::forward<std::string&&>(buffer))
     {
         if (m_temp.empty())
             return;

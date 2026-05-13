@@ -35,7 +35,10 @@ class AsciiArray
 public:
     static_assert(std::is_arithmetic_v<T>);
     using Type = T;
-    [[nodiscard]] inline AsciiArray(std::string&& buffer, std::size_t offset = 0) : m_temp(buffer), m_offset(offset) {}
+    [[nodiscard]] inline AsciiArray(std::string&& buffer, std::size_t offset = 0)
+        : m_temp(std::forward<std::string&&>(buffer)), m_offset(offset)
+    {
+    }
     [[nodiscard]] inline operator std::vector<T>() const&&
     {
         std::vector<T> vec;
@@ -51,8 +54,17 @@ public:
                                 return std::nullopt;
                             return value;
                         }) |
-                    std::views::filter([](auto v) { return v.has_value(); });
-        std::ranges::transform(view, std::back_inserter(vec), [](auto value) { return *value; });
+                    std::views::filter(
+                        [](auto v)
+                        {
+                            return v.has_value();
+                        });
+        std::ranges::transform(view,
+                               std::back_inserter(vec),
+                               [](auto value)
+                               {
+                                   return *value;
+                               });
         return vec;
     }
 
@@ -112,7 +124,10 @@ class AsciiArray<std::complex<T>>
 public:
     static_assert(std::is_arithmetic_v<T>);
     using Type = std::complex<T>;
-    [[nodiscard]] inline AsciiArray(std::string&& buffer, std::size_t offset = 0) : m_temp(buffer), m_offset(offset) {}
+    [[nodiscard]] inline AsciiArray(std::string&& buffer, std::size_t offset = 0)
+        : m_temp(std::forward<std::string&&>(buffer)), m_offset(offset)
+    {
+    }
     [[nodiscard]] inline operator std::vector<Type>() const&&
     {
         std::vector<Type> vec;
@@ -128,8 +143,17 @@ public:
                                 return std::nullopt;
                             return value;
                         }) |
-                    std::views::filter([](auto v) { return v.has_value(); });
-        std::ranges::transform(view, _complexBackInsert(vec), [](auto value) { return *value; });
+                    std::views::filter(
+                        [](auto v)
+                        {
+                            return v.has_value();
+                        });
+        std::ranges::transform(view,
+                               _complexBackInsert(vec),
+                               [](auto value)
+                               {
+                                   return *value;
+                               });
         return vec;
     }
 
