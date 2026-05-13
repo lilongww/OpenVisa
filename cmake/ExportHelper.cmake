@@ -1,4 +1,4 @@
-function(export_config target_name installdir includedir libusb_debug_library libusb_release_library libusb_debug_dll libusb_release_dll libusb_use_static)
+﻿function(export_config target_name installdir includedir libusb_debug_library libusb_release_library libusb_debug_dll libusb_release_dll libusb_use_static)
     include(CMakePackageConfigHelpers)
 
     configure_package_config_file("${PROJECT_SOURCE_DIR}/cmake/${target_name}Config.cmake.in"
@@ -24,6 +24,6 @@ function(export_install_target target_name includedir libdir bindir)
         RUNTIME DESTINATION ${bindir}/${CMAKE_BUILD_TYPE}
         PUBLIC_HEADER DESTINATION ${includedir}/${target_name})
 
-    install(EXPORT ${target_name} FILE "${target_name}Targets.cmake" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/cmake")
+    install(EXPORT ${target_name} FILE "${target_name}Targets.cmake" NAMESPACE OpenVisa:: DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/cmake")
     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake" DESTINATION "${libdir}" FILES_MATCHING PATTERN "*.cmake")
 endfunction()
