@@ -20,7 +20,7 @@ BEGIN
             VALUE "FileDescription", "OpenVisa"
             VALUE "FileVersion", "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
             VALUE "InternalName", "OpenVisa"
-            VALUE "LegalCopyright", "Copyright (C) 2022-2025 OpenVisa"
+            VALUE "LegalCopyright", "Copyright (C) 2022-2026 OpenVisa"
             VALUE "OriginalFilename", "OpenVisa.dll"
             VALUE "ProductName", "OpenVisa"
             VALUE "ProductVersion", "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"

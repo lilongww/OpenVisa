@@ -145,9 +145,13 @@ void HiSLIP::errorCheck(HS::HSBuffer& buffer) const
     }
 }
 
-HiSLIP::HiSLIP(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>(attr)) {}
+HiSLIP::HiSLIP(Object::Attribute const& attr) : IOBase(attr), m_impl(std::make_unique<Impl>(attr))
+{
+}
 
-HiSLIP::~HiSLIP() {}
+HiSLIP::~HiSLIP()
+{
+}
 
 void HiSLIP::connect(const Address<AddressType::HiSLIP>& address, const std::chrono::milliseconds& openTimeout)
 {
@@ -210,7 +214,10 @@ std::string HiSLIP::readAll() const
     }
 }
 
-std::string HiSLIP::read(size_t size) const { return readAll(); }
+std::string HiSLIP::read(size_t size) const
+{
+    return readAll();
+}
 
 void HiSLIP::close() noexcept
 {
@@ -222,10 +229,19 @@ void HiSLIP::close() noexcept
     }
 }
 
-bool HiSLIP::connected() const noexcept { return m_impl->connected && m_impl->socket.connected() && m_impl->asyncSocket.connected(); }
+bool HiSLIP::connected() const noexcept
+{
+    return m_impl->connected && m_impl->socket.connected() && m_impl->asyncSocket.connected();
+}
 
-size_t HiSLIP::avalible() const noexcept { return {}; }
+size_t HiSLIP::avalible() const noexcept
+{
+    return {};
+}
 
-void HiSLIP::reset() { m_impl->socket.reset(); }
+void HiSLIP::reset()
+{
+    m_impl->socket.reset();
+}
 
 } // namespace OpenVisa

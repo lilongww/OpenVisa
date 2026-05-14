@@ -41,13 +41,8 @@ struct Object::Attribute::Impl
     std::function<std::string(std::string_view)> sendTransform;
     std::function<void(std::string&)> readTransform;
 
-    inline Impl(std::shared_ptr<IOBase>* _io) : io(_io)
-    {
-    }
-    inline std::shared_ptr<SerialPort> asSerialPort() const
-    {
-        return io ? std::dynamic_pointer_cast<SerialPort>(*io) : nullptr;
-    }
+    inline Impl(std::shared_ptr<IOBase>* _io) : io(_io) {}
+    inline std::shared_ptr<SerialPort> asSerialPort() const { return io ? std::dynamic_pointer_cast<SerialPort>(*io) : nullptr; }
 };
 
 /*!

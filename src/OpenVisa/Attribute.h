@@ -21,8 +21,8 @@
 #include "Object.h"
 
 #include <chrono>
-#include <optional>
 #include <functional>
+#include <optional>
 
 namespace OpenVisa
 {
