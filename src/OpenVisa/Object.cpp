@@ -89,7 +89,7 @@ private:
 */
 
 /*!
-    \fn         template <IsAddress T> inline std::string OpenVisa::Object::toVisaAddressString(const T& addr);
+    \fn         template <IsAddress T> std::string OpenVisa::Object::toVisaAddressString(const T& addr);
     \brief      将地址类型 \a addr 转换为 Visa 连接描述字符串.
     \sa         fromVisaAddressString
 */

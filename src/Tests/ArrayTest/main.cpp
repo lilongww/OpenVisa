@@ -59,8 +59,8 @@ TEST(ArrayTest, BinaryArray_string)
     buffer[1] = '2';
     buffer[2] = '1';
     buffer[3] = '6';
-    std::string v { std::start_lifetime_as_array<const char>(vec1.data(), vec1.size() * sizeof(std::vector<double>::value_type)),
-                    vec1.size() * sizeof(std::vector<double>::value_type) };
+    auto sz   = vec1.size() * sizeof(std::vector<double>::value_type);
+    std::string v { std::start_lifetime_as_array<const char>(vec1.data(), sz), sz };
     memcpy(buffer.data() + 4, vec1.data(), vec1.size() * sizeof(double));
     EXPECT_EQ(v, static_cast<std::string>(OpenVisa::BinaryArray<std::string>(std::move(buffer))));
 }
@@ -73,9 +73,8 @@ TEST(ArrayTest, BinaryArray_wstring)
     buffer[1] = '2';
     buffer[2] = '1';
     buffer[3] = '6';
-    std::wstring v { std::start_lifetime_as_array<const wchar_t>(vec1.data(),
-                                                                 vec1.size() * sizeof(std::vector<double>::value_type) / sizeof(wchar_t)),
-                     vec1.size() * sizeof(std::vector<double>::value_type) / sizeof(wchar_t) };
+    auto sz   = vec1.size() * sizeof(std::vector<double>::value_type) / sizeof(wchar_t);
+    std::wstring v { std::start_lifetime_as_array<const wchar_t>(vec1.data(), sz), sz };
     memcpy(buffer.data() + 4, vec1.data(), vec1.size() * sizeof(double));
     EXPECT_EQ(v, static_cast<std::wstring>(OpenVisa::BinaryArray<std::wstring>(std::move(buffer))));
 }
