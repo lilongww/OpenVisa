@@ -48,11 +48,15 @@ public:
                  const std::chrono::milliseconds& commandTimeout = std::chrono::milliseconds { 5000 });
     void close() noexcept;
     template<typename... Args>
-    inline void send(const std::string& fmt, const Args&... args);
+    requires(sizeof...(Args) > 0)
+    inline void send(const std::format_string<Args...>& fmt, Args&&... args);
+    inline void send(const std::string& scpi);
     [[nodiscard]] std::string readAll();
     [[nodiscard]] std::tuple<std::string, bool> read(unsigned long blockSize);
     template<typename... Args>
-    [[nodiscard]] inline std::string query(const std::string& fmt, const Args&... args);
+    requires(sizeof...(Args) > 0)
+    [[nodiscard]] inline std::string query(const std::format_string<Args...>& fmt, Args&&... args);
+    [[nodiscard]] inline std::string query(const std::string& scpi);
     [[nodiscard]] bool connected() const noexcept;
     [[nodiscard]] Attribute& attribute() noexcept;
     [[nodiscard]] const Attribute& attribute() const noexcept;
@@ -87,18 +91,28 @@ inline void Object::connect(const T& addr, const std::chrono::milliseconds& open
 }
 
 template<typename... Args>
-inline void Object::send(const std::string& fmt, const Args&... args)
+requires(sizeof...(Args) > 0)
+inline void Object::send(const std::format_string<Args...>& fmt, Args&&... args)
 {
-    if constexpr (sizeof...(args))
-        sendImpl(std::vformat(fmt, std::make_format_args(std::forward<const Args&>(args)...)));
-    else
-        sendImpl(fmt);
+    sendImpl(std::format(fmt, std::forward<Args&&>(args)...));
+}
+
+inline void Object::send(const std::string& scpi)
+{
+    sendImpl(scpi);
 }
 
 template<typename... Args>
-std::string Object::query(const std::string& fmt, const Args&... args)
+requires(sizeof...(Args) > 0)
+inline std::string Object::query(const std::format_string<Args...>& fmt, Args&&... args)
 {
-    send(fmt, std::forward<const Args&>(args)...);
+    send(fmt, std::forward<Args&&>(args)...);
+    return readAll();
+}
+
+inline std::string Object::query(const std::string& scpi)
+{
+    send(scpi);
     return readAll();
 }
 
@@ -133,7 +147,11 @@ struct VisaAdl
         }                                                                                                                                  \
         inline static void fromScpi(const std::string& scpi, Enum& e)                                                                      \
         {                                                                                                                                  \
-            if (auto it = std::ranges::find_if(m_enumStrings, [&](const auto& str) { return scpi.starts_with(str); });                     \
+            if (auto it = std::ranges::find_if(m_enumStrings,                                                                              \
+                                               [&](const auto& str)                                                                        \
+                                               {                                                                                           \
+                                                   return scpi.starts_with(str);                                                           \
+                                               });                                                                                         \
                 it != m_enumStrings.end())                                                                                                 \
                 e = static_cast<Enum>(std::distance(m_enumStrings.begin(), it) + static_cast<Int>(EnumBegin));                             \
             else                                                                                                                           \

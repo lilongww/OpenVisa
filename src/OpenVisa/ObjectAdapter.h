@@ -28,11 +28,15 @@ class ObjectAdapter
 public:
     [[nodiscard]] inline Object& object() { return m_object; }
     template<typename... Args>
-    inline void send(const std::string& fmt, const Args&... args);
+    requires(sizeof...(Args) > 0)
+    inline void send(const std::format_string<Args...>& fmt, Args&&... args);
+    inline void send(const std::string& scpi) { m_object.send(scpi); }
     [[nodiscard]] inline std::string readAll() { return m_object.readAll(); }
     [[nodiscard]] inline std::tuple<std::string, bool> read(unsigned long blockSize) { return m_object.read(blockSize); }
     template<typename... Args>
-    [[nodiscard]] inline std::string query(const std::string& fmt, const Args&... args);
+    requires(sizeof...(Args) > 0)
+    [[nodiscard]] inline std::string query(const std::format_string<Args...>& fmt, Args&&... args);
+    [[nodiscard]] inline std::string query(const std::string& scpi) { return m_object.query(scpi); }
     [[nodiscard]] inline Object::Attribute& attribute() noexcept { return m_object.attribute(); }
     [[nodiscard]] inline const Object::Attribute& attribute() const noexcept { return m_object.attribute(); }
     [[nodiscard]] inline Object::CommonCommand& commonCommand() noexcept { return m_object.commonCommand(); }
@@ -46,13 +50,15 @@ private:
     Object& m_object;
 };
 template<typename... Args>
-inline void ObjectAdapter::send(const std::string& fmt, const Args&... args)
+requires(sizeof...(Args) > 0)
+inline void ObjectAdapter::send(const std::format_string<Args...>& fmt, Args&&... args)
 {
-    m_object.send(fmt, std::forward<const Args&>(args)...);
+    m_object.send(fmt, std::forward<Args&&>(args)...);
 }
 template<typename... Args>
-inline std::string ObjectAdapter::query(const std::string& fmt, const Args&... args)
+requires(sizeof...(Args) > 0)
+inline std::string ObjectAdapter::query(const std::format_string<Args...>& fmt, Args&&... args)
 {
-    return m_object.query(fmt, std::forward<const Args&>(args)...);
+    return m_object.query(fmt, std::forward<Args&&>(args)...);
 }
 } // namespace OpenVisa
